@@ -1,0 +1,30 @@
+{
+  "name": "nodeops-frontend",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.4.3",
+    "@heroicons/vue": "^1.0.5",
+    "d3": "^7.3.0",
+    "dayjs": "^1.10.7",
+    "ethers": "^5.6.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.14"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.1.0",
+    "@types/node": "^17.0.17",
+    "@vitejs/plugin-vue": "^2.0.0",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.6",
+    "tailwindcss": "^3.0.18",
+    "typescript": "^4.4.4",
+    "vite": "^2.7.2",
+    "vite-svg-loader": "^3.1.2",
+    "vue-tsc": "^0.29.8"
+  }
+}
