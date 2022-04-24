@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import EmptyState from "../components/EmptyState.vue";
+import Container from "@/components/Container.vue";
+import SectionHeader from "@/components/SectionHeader.vue";
 </script>
 
 <template>
-  <div>Project</div>
+  <Container>
+    <SectionHeader title="Projects"></SectionHeader>
+  </Container>
 </template>

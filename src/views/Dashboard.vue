@@ -5,6 +5,6 @@ import SectionHeader from "@/components/SectionHeader.vue";
 
 <template>
   <Container>
-    <SectionHeader title="Reports"></SectionHeader>
+    <SectionHeader title="Dashboard"></SectionHeader>
   </Container>
 </template>

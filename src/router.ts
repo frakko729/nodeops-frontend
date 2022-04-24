@@ -1,44 +1,49 @@
-import Home from "./views/Home.vue";
-import NotFound from "./views/NotFound.vue";
-import Projects from "./views/Projects.vue";
-import Reports from "./views/Reports.vue";
-import Settings from "./views/Settings.vue";
-import Jobs from "./views/Jobs.vue";
-import CreateJob from "./views/CreateJob.vue";
+import { useUIStore } from "./stores/uiStore";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    name: "home",
-    component: Home,
+    name: "dashboard",
+    component: () =>
+      import(/* webpackChunkName: "dashboard" */ "@/views/Dashboard.vue"),
   },
   {
     path: "/jobs",
     name: "jobs",
-    component: Jobs,
+    component: () =>
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/Jobs.vue"),
   },
   {
     path: "/job/create",
     name: "job-create",
-    component: CreateJob,
+    component: () =>
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/CreateJob.vue"),
   },
   {
     path: "/projects",
     name: "projects",
-    component: Projects,
+    component: () =>
+      import(/* webpackChunkName: "projects" */ "@/views/Projects.vue"),
   },
   {
     path: "/reports",
     name: "reports",
-    component: Reports,
+    component: () =>
+      import(/* webpackChunkName: "reports" */ "@/views/Reports.vue"),
   },
   {
     path: "/settings",
     name: "settings",
-    component: Settings,
+    component: () =>
+      import(/* webpackChunkName: "settings" */ "@/views/Settings.vue"),
   },
-  { path: "/:pathMatch(.*)*", name: "NotFound", component: NotFound },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () =>
+      import(/* webpackChunkName: "errors" */ "@/views/errors/NotFound.vue"),
+  },
 ];
 
 const router = createRouter({
@@ -47,6 +52,17 @@ const router = createRouter({
   scrollBehavior(to, from, savedPosition) {
     return { top: 0 };
   },
+});
+
+/**
+ * Close mobile navigation before route change
+ */
+router.beforeEach(() => {
+  const uiStore = useUIStore();
+  if (uiStore.isMobileNavigation) {
+    uiStore.toggleMobileNavigation();
+  }
+  return true;
 });
 
 export default router;

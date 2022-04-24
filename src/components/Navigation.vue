@@ -1,13 +1,31 @@
 <script setup lang="ts">
+import VueBlockies from "vue-blockies";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { BellIcon, MenuAlt1Icon } from "@heroicons/vue/outline";
 import { ChevronDownIcon, SearchIcon } from "@heroicons/vue/solid";
+import { useUserStore } from "@/stores/userStore";
+import { useUIStore } from "@/stores/uiStore";
+const userStore = useUserStore();
+const uiStore = useUIStore();
 </script>
 
 <template>
   <div
     class="border-b border-gray-200/50 bg-white flex-1 py-3 px-4 flex justify-between sm:px-6 w-full lg:px-8"
   >
+    <div
+      class="w-10 h-full flex self-center border-r border-gray-200 mr-2 lg:hidden"
+    >
+      <button
+        type="button"
+        class="text-gray-400 focus:outline-none"
+        @click="uiStore.toggleMobileNavigation()"
+      >
+        <span class="sr-only">Open sidebar</span>
+        <MenuAlt1Icon class="h-6 w-6" aria-hidden="true" />
+      </button>
+    </div>
+
     <div class="flex-1 flex">
       <form class="w-full flex md:ml-0" action="#" method="GET">
         <label for="search-field" class="sr-only">Search</label>
@@ -43,14 +61,18 @@ import { ChevronDownIcon, SearchIcon } from "@heroicons/vue/solid";
           <MenuButton
             class="max-w-xs bg-white rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 lg:p-2 lg:rounded-md lg:hover:bg-gray-50"
           >
-            <img
-              class="h-8 w-8 rounded-full"
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-              alt=""
-            />
+            <div class="rounded-full w-8 h-8 overflow-hidden">
+              <VueBlockies
+                :seed="userStore.address"
+                color="#93c5fd"
+                bgcolor="#3b82f6"
+                :size="8"
+                spot-color="#2563eb"
+              />
+            </div>
             <span class="hidden ml-3 text-gray-700 text-sm font-medium lg:block"
-              ><span class="sr-only">Open user menu for </span>Emilia
-              Birch</span
+              ><span class="sr-only">Open user menu for </span
+              >{{ userStore.shortAdress }}</span
             >
             <ChevronDownIcon
               class="hidden flex-shrink-0 ml-1 h-5 w-5 text-gray-400 lg:block"
@@ -70,23 +92,13 @@ import { ChevronDownIcon, SearchIcon } from "@heroicons/vue/solid";
             class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
           >
             <MenuItem v-slot="{ active }">
-              <a
-                href="#"
+              <router-link
+                :to="{ name: 'settings' }"
                 :class="[
                   active ? 'bg-gray-100' : '',
                   'block px-4 py-2 text-sm text-gray-700',
                 ]"
-                >Your Profile</a
-              >
-            </MenuItem>
-            <MenuItem v-slot="{ active }">
-              <a
-                href="#"
-                :class="[
-                  active ? 'bg-gray-100' : '',
-                  'block px-4 py-2 text-sm text-gray-700',
-                ]"
-                >Settings</a
+                >Settings</router-link
               >
             </MenuItem>
             <MenuItem v-slot="{ active }">

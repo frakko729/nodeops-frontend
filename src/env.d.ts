@@ -16,3 +16,5 @@ declare module "d3" {
   import * as d3Types from "@types/d3";
   export = d3Types;
 }
+
+declare module "vue-blockies";

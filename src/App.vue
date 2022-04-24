@@ -9,8 +9,8 @@ import Navigation from "./components/Navigation.vue";
     <SidebarNavigation />
 
     <div class="lg:pl-64 flex flex-col flex-1">
-      <main class="flex-1 pb-8">
-        <Navigation />
+      <Navigation />
+      <main class="flex-1">
         <router-view v-slot="{ Component }">
           <template v-if="Component">
             <transition
@@ -26,10 +26,10 @@ import Navigation from "./components/Navigation.vue";
             </transition>
           </template>
         </router-view>
-        <teleport to="body">
-          <Notification />
-        </teleport>
       </main>
     </div>
+    <teleport to="body">
+      <Notification />
+    </teleport>
   </div>
 </template>
