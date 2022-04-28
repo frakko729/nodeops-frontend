@@ -11,9 +11,12 @@ import {
   RadioGroupOption,
 } from "@headlessui/vue";
 import { CheckIcon, SelectorIcon, CheckCircleIcon } from "@heroicons/vue/solid";
-import { useChain } from "@/composables/chains";
 import Container from "@/components/Container.vue";
 import Tabs from "../../components/Tabs.vue";
+import { useChainStore } from "@/stores/chainStore";
+
+const chainStore = useChainStore();
+chainStore.loadChains();
 
 const methods = [
   { id: 1, name: "GET" },
@@ -49,8 +52,6 @@ const mailingLists = [
   },
 ];
 const selectedMailingLists = ref(mailingLists[0]);
-
-const { chains } = useChain();
 </script>
 
 <template>
@@ -142,9 +143,9 @@ const { chains } = useChain();
         <div class="mt-4 grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-3">
           <RadioGroupOption
             as="template"
-            v-for="chain in chains"
-            :key="chain.chainId"
-            :value="chain"
+            v-for="chain in chainStore.chains"
+            :key="chain.id"
+            :value="chain.id"
             v-slot="{ checked, active }"
           >
             <div
@@ -160,10 +161,11 @@ const { chains } = useChain();
                     as="div"
                     class="block text-sm font-medium text-gray-900"
                   >
-                    <component
-                      :is="chain.icon"
+                    <img
+                      :src="`http://localhost/storage/${chain.image}`"
                       class="block w-12 h-12 sm:h-16 sm:w-16"
-                    ></component>
+                    />
+
                     <span class="block mt-4 text-gray-700">{{
                       chain.name
                     }}</span>
@@ -172,12 +174,12 @@ const { chains } = useChain();
                   <RadioGroupDescription
                     as="span"
                     :class="{
-                      'bg-blue-100 text-blue-800': chain.isMainnet,
-                      'bg-red-100 text-red-800': !chain.isMainnet,
+                      'bg-blue-100 text-blue-800': chain.is_mainnet,
+                      'bg-red-100 text-red-800': !chain.is_mainnet,
                     }"
                     class="mt-2 w-max inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                   >
-                    <span v-if="chain.isMainnet">Mainnet</span>
+                    <span v-if="chain.is_mainnet">Mainnet</span>
                     <span v-else>Testnet</span>
                   </RadioGroupDescription>
                 </div>

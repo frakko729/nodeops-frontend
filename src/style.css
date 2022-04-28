@@ -56,3 +56,44 @@
     url("@/assets/fonts/Inter-Black.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Chakra Petch"), local("Chakra-Petch"),
+    url("@/assets/fonts/ChakraPetch-Light.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Chakra Petch"), local("Chakra-Petch"),
+    url("@/assets/fonts/ChakraPetch-Regular.ttf") format("truetype");
+}
+
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 500;
+  src: local("Chakra Petch"), local("Chakra-Petch"),
+    url("@/assets/fonts/ChakraPetch-Medium.ttf") format("truetype");
+}
+
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Chakra Petch"), local("Chakra-Petch"),
+    url("@/assets/fonts/ChakraPetch-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Chakra Petch";
+  font-style: normal;
+  font-weight: 700;
+  src: local("Chakra Petch"), local("Chakra-Petch"),
+    url("@/assets/fonts/ChakraPetch-Bold.ttf") format("truetype");
+}

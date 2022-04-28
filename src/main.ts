@@ -1,4 +1,5 @@
-import { createApp } from "vue";
+import { Router } from "vue-router";
+import { createApp, markRaw } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import { createPinia } from "pinia";
@@ -17,9 +18,15 @@ const textStyle = {
   message: "text-red-500 mb-1 text-xs",
 };
 
+const pinia = createPinia();
+
+pinia.use(({ store }) => {
+  store.$router = markRaw(router) as Router;
+});
+
 const app = createApp(App);
 app.use(router);
-app.use(createPinia());
+app.use(pinia);
 app.use(
   plugin,
   defaultConfig({

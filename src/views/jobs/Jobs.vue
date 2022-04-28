@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { ChevronRightIcon, LinkIcon } from "@heroicons/vue/solid";
-import { useChain } from "@/composables/chains";
 import SimpleBarChart from "@/components/SimpleBarChart.vue";
 import Container from "@/components/Container.vue";
 import { useMath } from "@/composables/math";
@@ -9,8 +8,8 @@ import { FilterIcon, PlusIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 import Filter from "@/components/Filter.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
+import { useChainStore } from "@/stores/chainStore";
 
-const { chains } = useChain();
 const { randomIntArray } = useMath();
 
 const x = [
@@ -30,12 +29,14 @@ const x = [
   "14",
 ];
 
+const chainStore = useChainStore();
+chainStore.loadChains();
+
 const jobs = [
   {
     url: "https://external-api.dev/api/example",
     name: "Project ABC",
-    chain: chains[1],
-    href: "#",
+    href: "/jobs/1",
     status: "running",
     chart: {
       x: x,
@@ -46,8 +47,7 @@ const jobs = [
   {
     url: "https://external-api.dev/api/example",
     name: "NFT XYZ",
-    chain: chains[6],
-    href: "#",
+    href: "/jobs/2",
     status: "running",
     chart: {
       x: x,
@@ -58,8 +58,7 @@ const jobs = [
   {
     url: "https://external-api.dev/api/example",
     name: "Hackathon UVW",
-    chain: chains[10],
-    href: "#",
+    href: "/jobs/3",
     status: "warning",
     chart: {
       x: x,
@@ -70,8 +69,7 @@ const jobs = [
   {
     url: "https://external-api.dev/api/example",
     name: "Hackathon ERL",
-    chain: chains[8],
-    href: "#",
+    href: "/jobs/4",
     status: "error",
     chart: {
       x: x,
@@ -153,15 +151,18 @@ const onFilter = () => {
                   <span class="truncate">{{ job.url }}</span>
                 </p>
               </div>
-              <div class="flex space-x-4 w-1/6">
-                <component
+              <div
+                class="flex space-x-4 w-1/6"
+                v-if="chainStore.chains.length != 0"
+              >
+                <img
+                  :src="`http://localhost/storage/${chainStore.chains[0].image}`"
                   class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
-                  :is="job.chain.icon"
-                ></component>
+                />
                 <div
                   class="self-center h-max bg-blue-100 text-blue-800 w-max inline-flex items-center px-2 py-0 rounded-full text-xs font-medium"
                 >
-                  <span v-if="job.chain.isMainnet">Mainnet</span>
+                  <span v-if="chainStore.chains[0].is_mainnet">Mainnet</span>
                   <span v-else>Testnet</span>
                 </div>
               </div>
