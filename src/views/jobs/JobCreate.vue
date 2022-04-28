@@ -52,6 +52,8 @@ const mailingLists = [
   },
 ];
 const selectedMailingLists = ref(mailingLists[0]);
+
+const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
 </script>
 
 <template>
@@ -162,7 +164,7 @@ const selectedMailingLists = ref(mailingLists[0]);
                     class="block text-sm font-medium text-gray-900"
                   >
                     <img
-                      :src="`http://localhost/storage/${chain.image}`"
+                      :src="`${backend}storage/${chain.image}`"
                       class="block w-12 h-12 sm:h-16 sm:w-16"
                     />
 

@@ -88,6 +88,8 @@ const showFilter = ref(false);
 const onFilter = () => {
   showFilter.value = !showFilter.value;
 };
+
+const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
 </script>
 
 <template>
@@ -156,7 +158,7 @@ const onFilter = () => {
                 v-if="chainStore.chains.length != 0"
               >
                 <img
-                  :src="`http://localhost/storage/${chainStore.chains[0].image}`"
+                  :src="`${backend}storage/${chainStore.chains[0].image}`"
                   class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
                 />
                 <div
