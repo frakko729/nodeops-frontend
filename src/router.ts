@@ -106,7 +106,7 @@ router.beforeEach((to, from) => {
    * Check if route requires auth
    */
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    return { name: "landing-page" };
+    //return { name: "landing-page" }; // TODO add for production
   }
 
   /**
