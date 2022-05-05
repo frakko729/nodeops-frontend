@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { ChevronRightIcon, LinkIcon } from "@heroicons/vue/solid";
-import SimpleBarChart from "@/components/SimpleBarChart.vue";
+import SimpleBarChart from "@/components/charts/SimpleBarChart.vue";
 import Container from "@/components/Container.vue";
 import { useMath } from "@/composables/math";
 import { FilterIcon, PlusIcon } from "@heroicons/vue/solid";
@@ -9,6 +9,7 @@ import { ref } from "vue";
 import Filter from "@/components/Filter.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
 import { useChainStore } from "@/stores/chainStore";
+import { useGeneralStore } from "@/stores/generalStore";
 
 const { randomIntArray } = useMath();
 
@@ -89,7 +90,7 @@ const onFilter = () => {
   showFilter.value = !showFilter.value;
 };
 
-const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
+const generalStore = useGeneralStore();
 </script>
 
 <template>
@@ -158,7 +159,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
                 v-if="chainStore.chains.length != 0"
               >
                 <img
-                  :src="`${backend}storage/${chainStore.chains[0].image}`"
+                  :src="generalStore.getImage(chainStore.chains[0].image)"
                   class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
                 />
                 <div

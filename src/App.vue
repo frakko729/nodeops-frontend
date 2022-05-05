@@ -4,7 +4,5 @@ const route = useRoute();
 </script>
 
 <template>
-  <div>
-    <component :is="route.meta.layout" />
-  </div>
+  <component :is="route.meta.layout" />
 </template>

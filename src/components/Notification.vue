@@ -10,7 +10,7 @@ const loading = ref();
 <template>
   <div
     aria-live="assertive"
-    class="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:pt-24 sm:px-6 lg:px-8 sm:items-start"
+    class="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:pt-20 sm:px-6 lg:px-8 sm:items-start"
   >
     <div class="w-full flex flex-col items-center space-y-4 sm:items-end">
       <!-- Notification panel, dynamically insert this into the live region when it needs to be displayed -->
@@ -24,7 +24,7 @@ const loading = ref();
       >
         <div
           v-if="notification.show"
-          class="max-w-sm w-full bg-gray-700 shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
+          class="max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden"
         >
           <div class="p-4">
             <div class="flex items-start">
@@ -41,26 +41,23 @@ const loading = ref();
                 />
               </div>
               <div class="ml-3 w-0 flex-1 pt-0.5">
-                <p class="text-sm font-medium text-white">
+                <p class="text-sm font-medium text-black">
                   {{ notification.title }}
                 </p>
-                <p class="mt-1 text-sm text-gray-100">
+                <p class="mt-1 text-sm text-gray-800">
                   {{ notification.message }}
                 </p>
               </div>
               <div class="ml-4 flex-shrink-0 flex">
                 <button
                   @click="close()"
-                  class="bg-gray-800 p-1 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                  class="bg-gray-100 p-1 rounded-md inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
                 >
                   <span class="sr-only">Close</span>
                   <XIcon class="h-5 w-5" aria-hidden="true" />
                 </button>
               </div>
             </div>
-          </div>
-          <div class="bg-gray-500">
-            <div class="h-2 w-0 bg-gray-600" ref="loading"></div>
           </div>
         </div>
       </transition>

@@ -2,30 +2,21 @@
 import { defineComponent, h, markRaw } from "vue";
 import LandingPageHero from "@/assets/svgs/landing-page-hero.svg";
 import LandingPageScreenshot from "@/assets/landinpage-screenshot.jpg";
-import { Popover, PopoverButton, PopoverPanel } from "@headlessui/vue";
+import { Popover } from "@headlessui/vue";
 import {
-  CloudUploadIcon,
   CogIcon,
-  LockClosedIcon,
   LightningBoltIcon,
-  DocumentReportIcon,
   ArrowsExpandIcon,
   ChartBarIcon,
-  MenuIcon,
-  RefreshIcon,
   ServerIcon,
   ShieldCheckIcon,
-  XIcon,
 } from "@heroicons/vue/outline";
 import Discord from "@/assets/svgs/discord-brands.svg";
-import { ChevronRightIcon, ExternalLinkIcon } from "@heroicons/vue/solid";
+import { ExternalLinkIcon } from "@heroicons/vue/solid";
 import Logo from "@/components/Logo.vue";
 import { useUserStore } from "@/stores/userStore";
 
 const userStore = useUserStore();
-
-const navigation: Array<any> = [];
-
 const features = [
   {
     name: "Jobs on demand",
@@ -66,30 +57,6 @@ const features = [
 ];
 
 const footerNavigation = {
-  solutions: [
-    { name: "Marketing", href: "#" },
-    { name: "Analytics", href: "#" },
-    { name: "Commerce", href: "#" },
-    { name: "Insights", href: "#" },
-  ],
-  support: [
-    { name: "Pricing", href: "#" },
-    { name: "Documentation", href: "#" },
-    { name: "Guides", href: "#" },
-    { name: "API Status", href: "#" },
-  ],
-  company: [
-    { name: "About", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Jobs", href: "#" },
-    { name: "Press", href: "#" },
-    { name: "Partners", href: "#" },
-  ],
-  legal: [
-    { name: "Claim", href: "#" },
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
-  ],
   social: [
     {
       name: "Discord",
@@ -207,7 +174,7 @@ const footerNavigation = {
               <img
                 class="rounded-lg shadow-xl ring-1 ring-black ring-opacity-5"
                 :src="LandingPageScreenshot"
-                alt=""
+                alt="nodeops screenshot"
               />
             </div>
           </div>

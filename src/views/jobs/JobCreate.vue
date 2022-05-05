@@ -17,6 +17,7 @@ import { useChainStore } from "@/stores/chainStore";
 import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
+import { useGeneralStore } from "@/stores/generalStore";
 
 const chainStore = useChainStore();
 chainStore.loadChains();
@@ -73,7 +74,7 @@ const tabs: Array<any> = [
 
 const isValid = ref(false);
 
-const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
+const generalStore = useGeneralStore();
 </script>
 
 <template>
@@ -82,7 +83,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
       <Listbox as="div" v-model="jobData.method">
         <div class="relative w-28">
           <ListboxButton
-            class="h-12 bg-white relative w-full border border-gray-300 rounded-l-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            class="h-12 bg-white relative w-full border border-gray-300 rounded-l-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:border-blue-500 sm:text-sm"
           >
             <span class="block truncate">{{ jobData.method.name }}</span>
             <span
@@ -98,7 +99,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
             leave-to-class="opacity-0"
           >
             <ListboxOptions
-              class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base focus:outline-none focus:border-blue-500 sm:text-sm"
             >
               <ListboxOption
                 as="template"
@@ -139,7 +140,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
       </Listbox>
 
       <input
-        class="h-12 w-full px-4 rounded-r-md border border-gray-300 shadow-sm"
+        class="h-12 w-full px-4 rounded-r-md border border-gray-300 shadow-sm focus:outline-none focus:border-blue-500"
         placeholder="https://external-api.dev/api/example"
         v-model="jobData.url"
       />
@@ -222,7 +223,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
                     class="block text-sm font-medium text-gray-900"
                   >
                     <img
-                      :src="`${backend}storage/${chain.image}`"
+                      :src="generalStore.getImage(chain.image)"
                       class="block w-12 h-12 sm:h-16 sm:w-16"
                     />
 

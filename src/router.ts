@@ -1,9 +1,8 @@
 import { useUserStore } from "@/stores/userStore";
-import { useUIStore } from "./stores/uiStore";
+import { useGeneralStore } from "./stores/generalStore";
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LandingPageLayout from "./views/layouts/LandingPageLayout.vue";
 import AppLayout from "./views/layouts/AppLayout.vue";
-import AppLayout2 from "./views/layouts/AppLayout2.vue";
 import Cookies from "js-cookie";
 
 /**
@@ -25,56 +24,56 @@ const routes: Array<RouteRecordRaw> = [
     name: "dashboard",
     component: () =>
       import(/* webpackChunkName: "dashboard" */ "@/views/Dashboard.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/jobs",
     name: "jobs",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/Jobs.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/jobs/create",
     name: "job-create",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobCreate.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/jobs/:jobId",
     name: "job-detail",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobDetail.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/nodes",
     name: "nodes",
     component: () =>
       import(/* webpackChunkName: "nodes" */ "@/views/Nodes.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/reports",
     name: "reports",
     component: () =>
       import(/* webpackChunkName: "reports" */ "@/views/Reports.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/settings",
     name: "settings",
     component: () =>
       import(/* webpackChunkName: "settings" */ "@/views/Settings.vue"),
-    meta: { requiresAuth: true, layout: AppLayout2 },
+    meta: { requiresAuth: true, layout: AppLayout },
   },
   {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: () =>
       import(/* webpackChunkName: "errors" */ "@/views/errors/NotFound.vue"),
-    meta: { requiresAuth: false, layout: AppLayout2 },
+    meta: { requiresAuth: false, layout: LandingPageLayout },
   },
 ];
 
@@ -113,9 +112,9 @@ router.beforeEach((to, from) => {
   /**
    * Close mobile navigation before route change
    */
-  const uiStore = useUIStore();
-  if (uiStore.isMobileNavigation) {
-    uiStore.toggleMobileNavigation();
+  const generalStore = useGeneralStore();
+  if (generalStore.isMobileNavigation) {
+    generalStore.closeMobileNavigation();
   }
   return true;
 });

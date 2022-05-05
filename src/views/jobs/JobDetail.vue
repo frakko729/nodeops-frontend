@@ -6,15 +6,10 @@ import Container from "@/components/Container.vue";
 import { useChainStore } from "@/stores/chainStore";
 import ChainlinkLogo from "@/assets/svgs/chainlink-logo.svg";
 import { ArrowSmDownIcon, ArrowSmUpIcon } from "@heroicons/vue/solid";
-import {
-  CheckIcon,
-  CursorClickIcon,
-  MailOpenIcon,
-  UsersIcon,
-} from "@heroicons/vue/outline";
-import { PaperClipIcon } from "@heroicons/vue/solid";
-import BarChart from "@/components/BarChart.vue";
+import { CheckIcon, UsersIcon } from "@heroicons/vue/outline";
+import BarChart from "@/components/charts/BarChart.vue";
 import { useMath } from "@/composables/math";
+import { useGeneralStore } from "@/stores/generalStore";
 
 const { randomIntArray } = useMath();
 
@@ -91,7 +86,8 @@ const chainStore = useChainStore();
 chainStore.loadChains();
 
 const chartContainer = ref();
-const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
+
+const generalStore = useGeneralStore();
 </script>
 
 <template>
@@ -107,7 +103,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
             <div class="flex-shrink-0">
               <img
                 class="mx-auto h-20 w-20 rounded-full"
-                :src="`http://localhost/storage/${chainStore.chains[0].image}`"
+                :src="generalStore.getImage(chainStore.chains[0].image)"
               />
             </div>
             <div class="h-max self-center">
