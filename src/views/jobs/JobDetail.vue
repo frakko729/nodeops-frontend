@@ -91,6 +91,7 @@ const chainStore = useChainStore();
 chainStore.loadChains();
 
 const chartContainer = ref();
+const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
 </script>
 
 <template>

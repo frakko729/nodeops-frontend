@@ -51,32 +51,36 @@ const onTabChange = (tab: Tab) => {
     </div>
     <div class="hidden sm:block">
       <div class="border-b border-gray-200">
-        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-          <button
-            v-for="tab in reactiveTabs"
-            :key="tab.name"
-            @click="onTabChange(tab)"
-            :class="[
-              tab.current
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200',
-              'whitespace-nowrap flex py-4 px-1 border-b-2 font-medium text-sm transtion-all',
-            ]"
-            :aria-current="tab.current ? 'page' : undefined"
-          >
-            {{ tab.name }}
-            <span
-              v-if="tab.count"
+        <div class="flex justify-between items-center">
+          <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              v-for="tab in reactiveTabs"
+              :key="tab.name"
+              @click="onTabChange(tab)"
               :class="[
                 tab.current
-                  ? 'bg-blue-100 text-blue-600'
-                  : 'bg-gray-100 text-gray-900',
-                'hidden ml-3 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block transtion-all',
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-200',
+                'whitespace-nowrap flex py-4 px-1 border-b-2 font-medium text-sm transtion-all',
               ]"
-              >{{ tab.count }}</span
+              :aria-current="tab.current ? 'page' : undefined"
             >
-          </button>
-        </nav>
+              {{ tab.name }}
+              <span
+                v-if="tab.count"
+                :class="[
+                  tab.current
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'bg-gray-100 text-gray-900',
+                  'hidden ml-3 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block transtion-all',
+                ]"
+                >{{ tab.count }}</span
+              >
+            </button>
+          </nav>
+
+          <slot name="header" :activeTab="activeTab"> </slot>
+        </div>
       </div>
     </div>
     <div class="mt-4">

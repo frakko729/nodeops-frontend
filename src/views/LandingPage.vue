@@ -123,22 +123,7 @@ const footerNavigation = {
             class="relative max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6"
             aria-label="Global"
           >
-            <div class="flex items-center flex-1">
-              <div class="flex items-center justify-between w-full md:w-auto">
-                <a href="#">
-                  <Logo mode="white" class="text-white h-14" />
-                </a>
-              </div>
-              <div class="hidden space-x-8 md:flex md:ml-10">
-                <a
-                  v-for="item in navigation"
-                  :key="item.name"
-                  :href="item.href"
-                  class="text-base font-medium text-white hover:text-gray-300"
-                  >{{ item.name }}</a
-                >
-              </div>
-            </div>
+            <Logo mode="white" class="text-white h-14" />
           </nav>
         </div>
       </Popover>

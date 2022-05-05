@@ -125,8 +125,8 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
     <!-- Job list -->
     <ul role="list" class="space-y-4 mt-4">
       <li v-for="job in jobs" :key="job.name">
-        <a
-          :href="job.href"
+        <router-link
+          :to="job.href"
           class="h-full flex bg-white shadow hover:shadow-md overflow-hidden rounded-md group transition-all"
         >
           <div
@@ -185,7 +185,7 @@ const backend = import.meta.env.VITE_BACKEND_ENDPOINT;
               />
             </div>
           </div>
-        </a>
+        </router-link>
       </li>
     </ul>
   </Container>
