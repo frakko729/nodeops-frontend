@@ -32,7 +32,7 @@ const router = useRouter();
           </p>
           <div class="mt-6">
             <button
-              @click="router.back()"
+              @click="router.go(-2)"
               class="text-base font-medium text-blue-600 hover:text-blue-700 transition-colors"
             >
               Go back home<span aria-hidden="true"> &rarr;</span>
