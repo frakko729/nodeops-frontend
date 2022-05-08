@@ -42,6 +42,6 @@ watch(error, () => {
 <template>
   <Container v-if="node && !loading">
     <SectionHeader :title="node.name"></SectionHeader>
-    {{ node }}
+    <pre>{{ node }}</pre>
   </Container>
 </template>

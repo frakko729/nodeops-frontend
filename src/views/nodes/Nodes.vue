@@ -13,7 +13,7 @@ get(); // executes the get request, don't wait for the promise, use data and loa
 
     <div v-if="data && !loading" class="mt-8">
       <div v-for="node in data" :key="node.id" class="flex flex-col">
-        {{ node }}
+        <pre>{{ node }}</pre>
 
         <!-- Detail Page Link, check router.ts for names and parms -->
         <router-link
