@@ -18,6 +18,8 @@ export const useApi = <T>(endpoint: string, token?: string) => {
 
   const data: Ref<T | undefined> = ref();
 
+  const endpointRef = ref(endpoint);
+
   const loading = ref(false);
   const error = ref();
 
@@ -26,7 +28,7 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     error.value = undefined;
 
     return api
-      .post<T>(endpoint, payload)
+      .post<T>(endpointRef.value, payload)
       .then((res) => (data.value = res.data))
       .catch((e) => {
         error.value = e;
@@ -41,7 +43,7 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     error.value = undefined;
 
     return api
-      .patch<T>(endpoint, payload)
+      .patch<T>(endpointRef.value, payload)
       .then((res) => (data.value = res.data))
       .catch((e) => {
         error.value = e;
@@ -56,7 +58,7 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     error.value = undefined;
 
     return api
-      .put<T>(endpoint, payload)
+      .put<T>(endpointRef.value, payload)
       .then((res) => (data.value = res.data))
       .catch((e) => {
         error.value = e;
@@ -84,7 +86,7 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     }
 
     return api
-      .get<T>(endpoint + queryString, config)
+      .get<T>(endpointRef.value + queryString, config)
       .then((res) => (data.value = res.data))
       .catch((e) => {
         error.value = e;
@@ -99,7 +101,7 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     error.value = undefined;
 
     return api
-      .delete<T>(endpoint)
+      .delete<T>(endpointRef.value)
       .then((res) => (data.value = res.data))
       .catch((e) => {
         error.value = e;
@@ -161,6 +163,10 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     }
   });
 
+  const overrideEndpoint = (endpoint: string) => {
+    endpointRef.value = endpoint;
+  };
+
   return {
     loading,
     data,
@@ -174,5 +180,6 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     errorDetails,
     errorFields,
     computedClasses,
+    overrideEndpoint,
   };
 };

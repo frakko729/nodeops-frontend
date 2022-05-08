@@ -51,7 +51,14 @@ const routes: Array<RouteRecordRaw> = [
     path: "/nodes",
     name: "nodes",
     component: () =>
-      import(/* webpackChunkName: "nodes" */ "@/views/Nodes.vue"),
+      import(/* webpackChunkName: "nodes" */ "@/views/nodes/Nodes.vue"),
+    meta: { requiresAuth: true, layout: AppLayout },
+  },
+  {
+    path: "/nodes/:nodeId",
+    name: "node-detail",
+    component: () =>
+      import(/* webpackChunkName: "nodes" */ "@/views/nodes/NodeDetail.vue"),
     meta: { requiresAuth: true, layout: AppLayout },
   },
   {
