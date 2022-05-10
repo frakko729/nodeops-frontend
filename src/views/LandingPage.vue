@@ -19,39 +19,39 @@ import { useUserStore } from "@/stores/userStore";
 const userStore = useUserStore();
 const features = [
   {
-    name: "Jobs on demand",
+    name: "Jobs on-demand",
     description:
-      "Ac tincidunt sapien vehicula erat auctor pellentesque rhoncus. Et magna sit morbi vitae lobortis.",
+      "Change any aspect of your External adapter and create a new job with the click of a button",
     icon: ServerIcon,
   },
   {
     name: "Ligthning fast",
     description:
-      "Qui aut temporibus nesciunt vitae dicta repellat sit dolores pariatur. Temporibus qui illum aut.",
+      "Our nodes are industry leading in terms of reliability and speed.",
     icon: LightningBoltIcon,
   },
   {
     name: "Multichain support",
     description:
-      "Qui aut temporibus nesciunt vitae dicta repellat sit dolores pariatur. Temporibus qui illum aut",
+      "Support for all popular blockchains and their testnets.",
     icon: ArrowsExpandIcon,
   },
   {
     name: "Advanced Security",
     description:
-      "Ullam laboriosam est voluptatem maxime ut mollitia commodi. Et dignissimos suscipit perspiciatis.",
+      "Your jobs will be accessible by you and only you. We following industry standard security practices.",
     icon: ShieldCheckIcon,
   },
   {
     name: "Powerful Customization",
     description:
-      "Ab a facere voluptatem in quia corrupti veritatis aliquam. Veritatis labore quaerat ipsum quaerat id.",
+      "Put up and pull down jobs any time you want. Modify them at will and Pay only for what you use.",
     icon: CogIcon,
   },
   {
     name: "Monitoring",
     description:
-      "Quia qui et est officia cupiditate qui consectetur. Ratione similique et impedit ea ipsum et.",
+      "Not sure where your calls from smart contracts are failing? Could be the parmeters? Is the External Adapter up? Was there a problem processing on the node? Monitor all this with our job dashboard.",
     icon: ChartBarIcon,
   },
 ];
@@ -116,9 +116,8 @@ const footerNavigation = {
                   <p
                     class="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl"
                   >
-                    Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure
-                    qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam
-                    occaecat fugiat.
+                    Node Ops lets Chainlink developers run their Jobs on-demand. A developer can host their job on a blockchain of their choice with the click of a button. <br>
+Our mission: Creating a job for your EA should be a just a few clicks.
                   </p>
 
                   <div
@@ -165,9 +164,7 @@ const footerNavigation = {
                 No Chainlink node? No problem.
               </p>
               <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
-                Phasellus lorem quam molestie id quisque diam aenean nulla in.
-                Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-                condimentum id viverra nulla.
+               Run your jobs on NodeOps. You pick the blockchain and we run your Chainlink Job.
               </p>
             </div>
             <div class="mt-12 -mb-10 sm:-mb-24 lg:-mb-80">
@@ -193,13 +190,11 @@ const footerNavigation = {
             <p
               class="mt-2 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl"
             >
-              Everything you need for you'r API on Chainlink
+              Everything you need for your API on Chainlink
             </p>
             <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
-              Phasellus lorem quam molestie id quisque diam aenean nulla in.
-              Accumsan in quis quis nunc, ullamcorper malesuada. Eleifend
-              condimentum id viverra nulla.
-            </p>
+              Developers only create their External Adapters to bring data to blockchain. Your Chainlink Jobs will be run on our nodes.  
+	    </p>
             <div class="mt-12">
               <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 <div
@@ -266,10 +261,7 @@ const footerNavigation = {
                 We’re here to help
               </p>
               <p class="mt-3 text-lg text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Et,
-                egestas tempus tellus etiam sed. Quam a scelerisque amet
-                ullamcorper eu enim et fermentum, augue. Aliquet amet volutpat
-                quisque ut interdum tincidunt duis.
+                We plan to support all blockchains and testnets. Please feel free to reach out to us for feature requests and suggestions.
               </p>
               <div class="mt-8">
                 <div class="inline-flex rounded-md shadow">
