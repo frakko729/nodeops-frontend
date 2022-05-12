@@ -437,7 +437,7 @@ const getTomlSpec = async () => {
           <span class="block">Generate</span>
         </button>
       </div>
-      <TomlEditor class="mt-4" :input="tomlSpec" />
+      <TomlEditor class="mt-4" v-if="tomlSpec" :input="tomlSpec" />
     </div>
 
     <div class="w-full mt-8">

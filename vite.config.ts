@@ -12,6 +12,7 @@ export default defineConfig({
     svgLoader(),
   ],
   resolve: {
+    dedupe: ["vue"],
     alias: {
       "@": path.resolve(__dirname, "/src"),
     },

@@ -1,9 +1,11 @@
-<script setup lang="ts">
+<script lang="ts">
 import Prism from "prismjs";
 import "vue-code-highlight/themes/duotone-sea.css";
 import "vue-code-highlight/themes/window.css";
 import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
+</script>
 
+<script setup lang="ts">
 interface Props {
   input: string;
 }
