@@ -19,6 +19,7 @@ import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
 import { useGeneralStore } from "@/stores/generalStore";
 import { useApi } from "@/composables/api";
+import TomlEditor from "@/components/TomlEditor.vue";
 
 /**
  * Get chain data from backend
@@ -107,9 +108,8 @@ const isValid = ref(true);
 /**
  * Send data to backend
  */
-const { post, data, loading, error } = useApi("api/jobs");
-
 const onSubmit = async () => {
+  const { post, data, loading, error } = useApi("api/jobs");
   await post({
     name: jobData.name,
     method: jobData.method.name,
@@ -122,6 +122,25 @@ const onSubmit = async () => {
 
   console.log(error);
   console.log(data);
+};
+
+/**
+ * Get toml spec from input
+ */
+const tomlSpec = ref();
+const getTomlSpec = async () => {
+  const { post, data, loading, error } = useApi("api/jobs/toml");
+  await post({
+    name: jobData.name,
+    method: jobData.method.name,
+    url: jobData.url,
+    job_type_id: jobData.jobType.id,
+    chain_id: jobData.chain.id,
+    parameters: JSON.stringify(jobData.parms),
+    headers: JSON.stringify(jobData.headers),
+  });
+
+  tomlSpec.value = data.value;
 };
 </script>
 
@@ -405,6 +424,20 @@ const onSubmit = async () => {
         </div>
       </RadioGroup>
       <!-- Chain Input End -->
+    </div>
+
+    <div class="w-full mt-8">
+      <div class="flex items-center justify-between">
+        <p class="text-lg font-medium text-gray-900">TOML Spec</p>
+        <button
+          @click="getTomlSpec()"
+          type="button"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <span class="block">Generate</span>
+        </button>
+      </div>
+      <TomlEditor class="mt-4" :input="tomlSpec" />
     </div>
 
     <div class="w-full mt-8">

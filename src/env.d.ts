@@ -19,3 +19,4 @@ declare module "d3" {
 
 declare module "vue-blockies";
 declare module "js-cookie";
+declare module "prismjs";
