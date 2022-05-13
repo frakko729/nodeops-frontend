@@ -3,7 +3,11 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 const colors = require("tailwindcss/colors");
 
 module.exports = {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{vue,js,ts,jsx,tsx}",
+    "./src/formkit.classes.ts",
+  ],
   theme: {
     colors: {
       transparent: "transparent",
@@ -28,6 +32,6 @@ module.exports = {
   },
   plugins: [
     require("@tailwindcss/forms"),
-    require("@formkit/tailwindcss").default,
+    require("@formkit/themes/tailwindcss"),
   ],
 };

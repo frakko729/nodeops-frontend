@@ -1,10 +1,7 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <script setup lang="ts">
-import {
-  TrashIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-} from "@heroicons/vue/outline";
+import TableActions from "./TableActions.vue";
+import Toggle from "../Toggle.vue";
 
 interface KeyValue {
   id: number;
@@ -14,109 +11,140 @@ interface KeyValue {
 }
 
 interface Props {
+  disableInputs?: boolean;
+  keyLabel?: string;
+  valueLabel?: string;
   modelValue: Array<KeyValue>;
+  editCallback?: (parm: KeyValue) => any;
+  duplicateCallback?: (parm: KeyValue) => any;
+  removeCallback?: (parm: KeyValue) => any;
+  hideActions?: Array<string>;
 }
 
-const { modelValue } = defineProps<Props>();
+const {
+  modelValue,
+  disableInputs,
+  keyLabel = "Key",
+  valueLabel = "Value",
+  hideActions,
+  editCallback,
+  duplicateCallback,
+  removeCallback,
+} = defineProps<Props>();
 
 const emit = defineEmits(["update:modelValue"]);
 
-const toggleParm = (parm: KeyValue) => {
-  parm.isActive = !parm.isActive;
+/**
+ * Click on duplicate button
+ */
+const duplicateParm = (parm: KeyValue) => {
+  const item = modelValue.find((item: KeyValue) => item.id === parm.id);
+
+  if (item) {
+    item.id = modelValue.length;
+    modelValue.push(item);
+  }
+
+  if (duplicateCallback) {
+    duplicateCallback(parm);
+  }
 };
 
-const deleteParm = (parm: KeyValue) => {
+/**
+ * Click on edit button
+ */
+const editParm = (parm: KeyValue) => {
+  if (editCallback) {
+    editCallback(parm);
+  }
+};
+
+/**
+ * Click on remove button
+ */
+const removeParm = (parm: KeyValue) => {
   const index = modelValue.findIndex((item: KeyValue) => item.id === parm.id);
 
   if (index !== -1) {
     modelValue.splice(index, 1);
   }
+
+  if (removeCallback) {
+    removeCallback(parm);
+  }
 };
 </script>
 
 <template>
-  <div class="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-    <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-      <div
-        class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg"
-      >
-        <table class="min-w-full divide-y divide-gray-300">
-          <thead class="bg-gray-50">
-            <tr class="divide-x divide-gray-200">
-              <th
-                scope="col"
-                class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-              >
-                Key
-              </th>
-              <th
-                scope="col"
-                class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900"
-              >
-                Value
-              </th>
-
-              <th
-                scope="col"
-                class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900"
-              ></th>
-
-              <th
-                scope="col"
-                class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pr-6"
-              ></th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
-            <tr
-              v-for="parm in modelValue"
-              :key="parm.id"
-              class="divide-x divide-gray-200"
+  <div>
+    <div class="overflow border rounded-lg shadow-sm border-gray-200">
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead>
+          <tr class="divide-x divide-gray-200">
+            <th
+              scope="col"
+              class="py-3.5 pl-4 pr-4 text-left text-sm font-semibold text-gray-900 sm:pl-6"
             >
-              <td
-                class="whitespace-nowrap py-2 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6"
-              >
-                <input
-                  class="h-10 w-full bg-transparent border-transparent focus:outline-none focus:border-transparent rounded"
-                  placeholder="Key"
-                  v-model="parm.key"
-                />
-              </td>
-              <td class="whitespace-nowrap p-2 pl-4 text-sm text-gray-500">
-                <input
-                  class="h-10 w-full bg-transparent border-transparent focus:outline-none focus:border-transparent rounded"
-                  placeholder="Value"
-                  v-model="parm.value"
-                />
-              </td>
+              {{ keyLabel }}
+            </th>
+            <th
+              scope="col"
+              class="px-4 py-3.5 text-left text-sm font-semibold text-gray-900"
+            >
+              {{ valueLabel }}
+            </th>
 
-              <td class="whitespace-nowrap p-2 text-sm text-gray-500 w-16">
-                <button
-                  @click="toggleParm(parm)"
-                  :class="{
-                    'text-green-500 hover:text-gray-500': parm.isActive,
-                    'text-gray-500 hover:text-green-500': !parm.isActive,
-                  }"
-                  class="w-full h-full flex items-center justify-center transition-colors"
-                >
-                  <CheckCircleIcon class="w-6 h-6" />
-                </button>
-              </td>
+            <th
+              scope="col"
+              class="px-4 py-3.5 text-left text-sm font-semibold w-16"
+            ></th>
 
-              <td
-                class="whitespace-nowrap py-4 pl-4 pr-4 text-sm text-gray-500 sm:pr-6 w-16"
-              >
-                <button
-                  @click="deleteParm(parm)"
-                  class="w-full h-full flex items-center justify-center transition-colors text-red-500 hover:text-red-600"
-                >
-                  <TrashIcon class="w-6 h-6" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+            <th
+              scope="col"
+              class="px-4 py-3.5 text-left text-sm font-semibold"
+            ></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <tr
+            v-for="parm in modelValue"
+            :key="parm.id"
+            class="divide-x divide-gray-200"
+          >
+            <td
+              class="whitespace-nowrap py-2 pl-4 pr-4 text-sm font-medium text-gray-900 sm:pl-6"
+            >
+              <input
+                :disabled="disableInputs"
+                class="h-10 w-full bg-transparent border-transparent focus:outline-none focus:border-transparent rounded"
+                :placeholder="keyLabel"
+                v-model="parm.key"
+              />
+            </td>
+            <td class="whitespace-nowrap p-2 pl-4 text-sm text-gray-500">
+              <input
+                :disabled="disableInputs"
+                class="h-10 w-full bg-transparent border-transparent focus:outline-none focus:border-transparent rounded"
+                :placeholder="valueLabel"
+                v-model="parm.value"
+              />
+            </td>
+
+            <td class="whitespace-nowrap px-3 w-16">
+              <Toggle v-model="parm.isActive" />
+            </td>
+
+            <td class="whitespace-nowrap pl-[18px] w-16">
+              <TableActions
+                :hideActions="hideActions"
+                @remove="removeParm(parm)"
+                @duplicate="duplicateParm(parm)"
+                @edit="editParm(parm)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </template>

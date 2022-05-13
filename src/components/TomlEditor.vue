@@ -1,11 +1,13 @@
 <script lang="ts">
-import Prism from "prismjs";
 import "vue-code-highlight/themes/duotone-sea.css";
 import "vue-code-highlight/themes/window.css";
-import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
+import "prism-es6/components/prism-markup-templating";
+import "prism-es6/components/prism-toml";
 </script>
 
 <script setup lang="ts">
+import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
+
 interface Props {
   input: string;
 }
@@ -42,3 +44,9 @@ observationSource   = """
     </code-highlight>
   </div>
 </template>
+
+<style>
+div pre[class*="language-"] {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+</style>

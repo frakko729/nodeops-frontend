@@ -10,16 +10,24 @@ import {
   RadioGroupLabel,
   RadioGroupOption,
 } from "@headlessui/vue";
-import { CheckIcon, SelectorIcon, CheckCircleIcon } from "@heroicons/vue/solid";
+import {
+  CheckIcon,
+  SelectorIcon,
+  CheckCircleIcon,
+  PlusIcon,
+  CloudIcon,
+} from "@heroicons/vue/solid";
+import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
 import Container from "@/components/Container.vue";
 import Tabs from "../../components/Tabs.vue";
 import { useChainStore } from "@/stores/chainStore";
-import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
 import { useGeneralStore } from "@/stores/generalStore";
 import { useApi } from "@/composables/api";
 import TomlEditor from "@/components/TomlEditor.vue";
+import TaskModal from "../../components/modals/TaskModal.vue";
+import EmptyState from "@/components/EmptyState.vue";
 
 /**
  * Get chain data from backend
@@ -41,6 +49,13 @@ const methods = [
 ];
 const jobTypes = [{ id: 1, name: "Direct Request" }];
 
+interface Parms {
+  id: number;
+  key: string;
+  value: string;
+  isActive: boolean;
+}
+
 /**
  * Reactive user input data
  */
@@ -50,37 +65,47 @@ const jobData = reactive({
   url: "",
   method: methods[0],
   chain: {} as Backend.Models.Chain,
-  parms: [
-    {
-      id: 0,
-      key: "",
-      value: "",
-      isActive: true,
-    },
-  ],
-  headers: [
-    {
-      id: 0,
-      key: "",
-      value: "",
-      isActive: true,
-    },
-  ],
+  dynamicParms: [] as Array<Parms>,
+  staticParms: [] as Array<Parms>,
+  tasks: [] as Array<Parms>,
+  headers: [] as Array<Parms>,
 });
+
+/**
+ * TODO Test the request
+ */
+const testResult = ref();
+const testRequest = () => {
+  testResult.value = "test";
+};
 
 /**
  * Computed counts for tab
  * TODO don't count empty entries
  */
-const parmsCount = computed((): number => jobData.parms.length);
+const parmsStaticCount = computed((): number => jobData.staticParms.length);
+const parmsDynamicCount = computed((): number => jobData.dynamicParms.length);
+const tasksCount = computed((): number => jobData.tasks.length);
 const headersCount = computed((): number => jobData.headers.length);
 
 /**
  * Tabs definition
  */
 const tabs: Array<any> = [
-  { name: "Parameters", href: "#", count: parmsCount, current: true },
+  {
+    name: "Static Parameters",
+    href: "#",
+    count: parmsStaticCount,
+    current: true,
+  },
+  {
+    name: "Dynamic Parameters",
+    href: "#",
+    count: parmsDynamicCount,
+    current: false,
+  },
   { name: "Headers", href: "#", count: headersCount, current: false },
+  { name: "Tasks", href: "#", count: tasksCount, current: false },
   { name: "Test", href: "#", current: false },
 ];
 
@@ -116,7 +141,7 @@ const onSubmit = async () => {
     url: jobData.url,
     job_type_id: jobData.jobType.id,
     chain_id: jobData.chain.id,
-    parameters: JSON.stringify(jobData.parms),
+    parameters: JSON.stringify(jobData.staticParms),
     headers: JSON.stringify(jobData.headers),
   });
 
@@ -136,11 +161,34 @@ const getTomlSpec = async () => {
     url: jobData.url,
     job_type_id: jobData.jobType.id,
     chain_id: jobData.chain.id,
-    parameters: JSON.stringify(jobData.parms),
+    parameters: JSON.stringify(jobData.staticParms),
     headers: JSON.stringify(jobData.headers),
   });
 
   tomlSpec.value = data.value;
+};
+
+const isTaskModalOpen = ref(false);
+const openTaskModal = () => {
+  isTaskModalOpen.value = true;
+};
+const onTaskModalClose = () => {
+  isTaskModalOpen.value = false;
+};
+const onTaskModalAdd = (task: any, values: any) => {
+  Object.keys(values).forEach((key: any) => {});
+
+  let id = 0;
+  if (jobData.tasks.length !== 0) {
+    id = jobData.tasks[jobData.tasks.length - 1].id + 1;
+  }
+
+  jobData.tasks.push({
+    id: id,
+    key: task.name,
+    value: JSON.stringify(values, null, "\t"),
+    isActive: true,
+  });
 };
 </script>
 
@@ -293,8 +341,8 @@ const getTomlSpec = async () => {
       <template #header="{ activeTab }">
         <!-- Parameters Tab Header Start -->
         <button
-          v-if="activeTab?.name === 'Parameters'"
-          @click="addKeyValuePair(jobData.parms)"
+          v-if="activeTab?.name === 'Static Parameters'"
+          @click="addKeyValuePair(jobData.staticParms)"
           type="button"
           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
@@ -315,6 +363,18 @@ const getTomlSpec = async () => {
         </button>
         <!-- Headers Tab Header End -->
 
+        <!-- Tasks Tab Header Start -->
+        <button
+          v-if="activeTab?.name === 'Tasks'"
+          @click="openTaskModal()"
+          type="button"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <PlusIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
+          <span class="hidden sm:block">Add</span>
+        </button>
+        <!-- Tasks Tab Header End -->
+
         <!-- Test Tab Header Start -->
         <button
           v-if="activeTab?.name === 'Test'"
@@ -330,24 +390,62 @@ const getTomlSpec = async () => {
 
       <template #default="{ activeTab }">
         <!-- Parameters Tab Start -->
-        <div v-if="activeTab?.name === 'Parameters'">
-          <KeyValueTable v-model="jobData.parms" />
-
-          <span class="block mt-3 text-gray-600"
-            >These parameters will be availiable inside solidity, check docs for
-            more informations.</span
-          >
+        <div v-if="activeTab?.name === 'Static Parameters'">
+          <KeyValueTable
+            v-model="jobData.staticParms"
+            v-if="jobData.staticParms.length != 0"
+            :hide-actions="['edit']"
+          />
+          <EmptyState
+            v-else
+            text="Add static parameters to the request"
+            @click="addKeyValuePair(jobData.staticParms)"
+          />
         </div>
         <!-- Parameters Tab End -->
 
+        <!-- Tasks Tab Start -->
+        <div v-if="activeTab?.name === 'Tasks'">
+          <KeyValueTable
+            key-label="Task"
+            :disable-inputs="true"
+            v-model="jobData.tasks"
+            v-if="jobData.tasks.length != 0"
+          />
+
+          <EmptyState
+            v-else
+            text="Add tasks into the job pipline"
+            @click="openTaskModal()"
+          />
+        </div>
+        <!-- Tasks Tab End -->
+
         <!-- Headers Tab Start -->
         <div v-if="activeTab?.name === 'Headers'">
-          <KeyValueTable v-model="jobData.headers" />
+          <KeyValueTable
+            v-model="jobData.headers"
+            v-if="jobData.headers.length != 0"
+            :hide-actions="['edit']"
+          />
+          <EmptyState
+            v-else
+            text="Add headers to the request"
+            @click="addKeyValuePair(jobData.headers)"
+          />
         </div>
         <!-- Headers Tab End -->
 
         <!-- Test Tab Start -->
-        <div v-if="activeTab?.name === 'Test'"><JsonOutput /></div>
+        <div v-if="activeTab?.name === 'Test'">
+          <JsonOutput v-if="testResult" />
+          <EmptyState
+            :icon="CloudOutlineIcon"
+            v-else
+            text="Test the result of the request"
+            @click="testRequest()"
+          />
+        </div>
         <!-- Test Tab End -->
       </template>
     </Tabs>
@@ -437,7 +535,7 @@ const getTomlSpec = async () => {
           <span class="block">Generate</span>
         </button>
       </div>
-      <TomlEditor class="mt-4" v-if="tomlSpec" :input="tomlSpec" />
+      <TomlEditor class="mt-4" :input="tomlSpec" />
     </div>
 
     <div class="w-full mt-8">
@@ -453,5 +551,13 @@ const getTomlSpec = async () => {
         <span class="w-full">Create Job</span>
       </button>
     </div>
+
+    <teleport to="body">
+      <TaskModal
+        :open="isTaskModalOpen"
+        @close="onTaskModalClose()"
+        @add="onTaskModalAdd"
+      />
+    </teleport>
   </Container>
 </template>

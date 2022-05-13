@@ -8,8 +8,9 @@
   },
   "dependencies": {
     "@formkit/tailwindcss": "^1.0.0-beta.6",
+    "@formkit/themes": "^1.0.0-beta.8",
     "@formkit/vue": "^1.0.0-beta.6",
-    "@headlessui/vue": "^1.4.3",
+    "@headlessui/vue": "^1.6.1",
     "@heroicons/vue": "^1.0.5",
     "axios": "^0.26.1",
     "d3": "^7.3.0",
