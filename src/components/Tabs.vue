@@ -1,11 +1,6 @@
 <script setup lang="ts">
+import { Tab } from "@/interfaces/Tab";
 import { computed, reactive } from "vue";
-
-export interface Tab {
-  name: string;
-  count?: number | undefined;
-  current: boolean;
-}
 
 interface Props {
   tabs: Array<Tab>;
@@ -84,7 +79,7 @@ const onTabChange = (tab: Tab) => {
       </div>
     </div>
     <div class="mt-4">
-      <slot :activeTab="activeTab"></slot>
+      <slot :activeTab="activeTab"> </slot>
     </div>
   </div>
 </template>

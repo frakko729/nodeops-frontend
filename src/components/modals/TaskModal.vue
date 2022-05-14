@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { reactive, ref, watch, watchEffect } from "vue";
 import {
   Dialog,
   DialogPanel,
@@ -8,20 +8,13 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import { BeakerIcon } from "@heroicons/vue/outline";
-import {
-  Listbox,
-  ListboxButton,
-  ListboxLabel,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/vue";
-import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
 import { FormKitSchema } from "@formkit/vue";
+import Listbox from "../Listbox.vue";
 
 /**
  * Tasks boilerplate
  */
-const tasks = [
+const tasks = reactive([
   {
     id: 1,
     name: "JSON Parse",
@@ -71,39 +64,65 @@ const tasks = [
       },
     ],
   },
-];
+]);
 
 /**
  * Reactive variables
  */
 const selectedTask = ref(tasks[0]);
-const dynamicForm = ref();
+const taskForm = ref();
 
 /**
  * Modal state handling
  */
 interface Props {
   open: boolean;
+  edit?: any;
 }
-const { open } = defineProps<Props>();
-const emit = defineEmits(["close", "add"]);
+const { open, edit } = defineProps<Props>();
+const emit = defineEmits(["close", "add", "edit"]);
 const close = () => {
   emit("close");
 };
 
 /**
+ * Check if modal is in edit mode and pre select/fill data
+ */
+watchEffect(() => {
+  if (edit) {
+    const editParsed = JSON.parse(edit.value);
+
+    const task = tasks.find((item: any) => item.name === edit.key);
+    if (task) {
+      Object.keys(editParsed).forEach((key: any) => {
+        const input: any = task.inputs.find((item: any) => item.name === key);
+        if (input) {
+          input.value = editParsed[key];
+        }
+      });
+    }
+  }
+});
+
+/**
  * Form Handling
  */
-const onAdd = () => {
-  if (dynamicForm.value) {
-    const node = dynamicForm.value.node;
+const onConfirm = () => {
+  if (taskForm.value) {
+    const node = taskForm.value.node;
     node.submit();
   }
 };
 const onSubmit = () => {
-  if (dynamicForm.value) {
-    const node = dynamicForm.value.node;
-    emit("add", selectedTask.value, node.value);
+  if (taskForm.value) {
+    const node = taskForm.value.node;
+
+    if (edit) {
+      emit("edit", selectedTask.value, node.value);
+    } else {
+      emit("add", selectedTask.value, node.value);
+    }
+
     close();
   }
 };
@@ -162,7 +181,8 @@ const onSubmit = () => {
                     as="h3"
                     class="text-lg leading-6 font-medium text-gray-900 text-center"
                   >
-                    Add a new task
+                    <span v-if="edit">Edit {{ selectedTask.name }}</span>
+                    <span v-else>Add a new task</span>
                   </DialogTitle>
                   <div class="mt-2">
                     <p class="text-sm text-gray-500 text-center">
@@ -178,80 +198,16 @@ const onSubmit = () => {
                     </p>
                   </div>
 
-                  <div class="mt-4">
-                    <Listbox as="div" v-model="selectedTask">
-                      <ListboxLabel
-                        class="block text-left text-sm font-medium text-gray-700"
-                      >
-                        Task
-                      </ListboxLabel>
-                      <div class="mt-1 relative">
-                        <ListboxButton
-                          class="bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 h-[42px] text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        >
-                          <span class="block truncate">{{
-                            selectedTask.name
-                          }}</span>
-                          <span
-                            class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
-                          >
-                            <SelectorIcon
-                              class="h-5 w-5 text-gray-400"
-                              aria-hidden="true"
-                            />
-                          </span>
-                        </ListboxButton>
-
-                        <transition
-                          leave-active-class="transition ease-in duration-100"
-                          leave-from-class="opacity-100"
-                          leave-to-class="opacity-0"
-                        >
-                          <ListboxOptions
-                            class="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm"
-                          >
-                            <ListboxOption
-                              as="template"
-                              v-for="task in tasks"
-                              :key="task.id"
-                              :value="task"
-                              v-slot="{ active, selected }"
-                            >
-                              <li
-                                :class="[
-                                  active
-                                    ? 'text-white bg-blue-600'
-                                    : 'text-gray-900',
-                                  'cursor-default select-none relative py-2 pl-3 pr-9',
-                                ]"
-                              >
-                                <span
-                                  :class="[
-                                    selected ? 'font-semibold' : 'font-normal',
-                                    'block truncate',
-                                  ]"
-                                >
-                                  {{ task.name }}
-                                </span>
-
-                                <span
-                                  v-if="selected"
-                                  :class="[
-                                    active ? 'text-white' : 'text-blue-600',
-                                    'absolute inset-y-0 right-0 flex items-center pr-4',
-                                  ]"
-                                >
-                                  <CheckIcon
-                                    class="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
-                                </span>
-                              </li>
-                            </ListboxOption>
-                          </ListboxOptions>
-                        </transition>
-                      </div>
-                    </Listbox>
+                  <div class="mt-6" v-if="!edit">
+                    <span
+                      class="block text-sm font-medium text-gray-700 formkit-invalid:text-red-500"
+                      >Task</span
+                    >
+                    <Listbox
+                      v-model="selectedTask"
+                      :list="tasks"
+                      class="h-10 mt-1"
+                    />
                   </div>
 
                   <div class="mt-5">
@@ -260,7 +216,7 @@ const onSubmit = () => {
                       type="form"
                       :actions="false"
                       :incomplete-message="false"
-                      ref="dynamicForm"
+                      ref="taskForm"
                       :config="{ validationVisibility: 'submit' }"
                       @submit="onSubmit()"
                     >
@@ -276,15 +232,16 @@ const onSubmit = () => {
                 class="mt-6 sm:mt-8 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense"
               >
                 <button
-                  @click="onAdd()"
+                  @click="onConfirm()"
                   type="button"
-                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm"
+                  class="btn btn-primary justify-center mt-3 sm:mt-0 sm:col-start-2"
                 >
-                  Add
+                  <span v-if="edit">Edit</span>
+                  <span v-else>Add</span>
                 </button>
                 <button
                   type="button"
-                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm"
+                  class="btn btn-white justify-center mt-3 sm:mt-0 sm:col-start-1 sm:text-sm"
                   @click="close()"
                   ref="cancelButtonRef"
                 >

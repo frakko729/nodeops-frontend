@@ -1,44 +1,18 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue";
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-  RadioGroup,
-  RadioGroupDescription,
-  RadioGroupLabel,
-  RadioGroupOption,
-} from "@headlessui/vue";
-import {
-  CheckIcon,
-  SelectorIcon,
-  CheckCircleIcon,
-  PlusIcon,
-  CloudIcon,
-} from "@heroicons/vue/solid";
+import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
 import Container from "@/components/Container.vue";
 import Tabs from "../../components/Tabs.vue";
-import { useChainStore } from "@/stores/chainStore";
 import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
-import { useGeneralStore } from "@/stores/generalStore";
 import { useApi } from "@/composables/api";
 import TomlEditor from "@/components/TomlEditor.vue";
 import TaskModal from "../../components/modals/TaskModal.vue";
 import EmptyState from "@/components/EmptyState.vue";
-
-/**
- * Get chain data from backend
- */
-const chainStore = useChainStore();
-chainStore.loadChains();
-
-/**
- * Import general store for resolving backend images
- */
-const generalStore = useGeneralStore();
+import ChainRadioGroup from "@/components/ChainRadioGroup.vue";
+import Listbox from "@/components/Listbox.vue";
+import { useNotification } from "@/composables/notification";
 
 /**
  * Static select data
@@ -96,6 +70,7 @@ const tabs: Array<any> = [
     name: "Static Parameters",
     href: "#",
     count: parmsStaticCount,
+
     current: true,
   },
   {
@@ -128,7 +103,14 @@ const addKeyValuePair = (appendTo: Array<any>) => {
   });
 };
 
-const isValid = ref(true);
+const dynamicForm = ref();
+
+const validateForm = () => {
+  if (dynamicForm.value) {
+    const node = dynamicForm.value.node;
+    node.submit();
+  }
+};
 
 /**
  * Send data to backend
@@ -141,12 +123,16 @@ const onSubmit = async () => {
     url: jobData.url,
     job_type_id: jobData.jobType.id,
     chain_id: jobData.chain.id,
-    parameters: JSON.stringify(jobData.staticParms),
+    static_parameters: JSON.stringify(jobData.staticParms),
+    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
+    tasks: JSON.stringify(jobData.tasks),
     headers: JSON.stringify(jobData.headers),
   });
 
-  console.log(error);
-  console.log(data);
+  if (data.value && !error.value) {
+    const { showSuccess } = useNotification();
+    showSuccess("Your job has been created successfully.");
+  }
 };
 
 /**
@@ -169,15 +155,16 @@ const getTomlSpec = async () => {
 };
 
 const isTaskModalOpen = ref(false);
+const taskToEdit = ref();
+
 const openTaskModal = () => {
   isTaskModalOpen.value = true;
 };
+
 const onTaskModalClose = () => {
   isTaskModalOpen.value = false;
 };
 const onTaskModalAdd = (task: any, values: any) => {
-  Object.keys(values).forEach((key: any) => {});
-
   let id = 0;
   if (jobData.tasks.length !== 0) {
     id = jobData.tasks[jobData.tasks.length - 1].id + 1;
@@ -190,173 +177,108 @@ const onTaskModalAdd = (task: any, values: any) => {
     isActive: true,
   });
 };
+
+const onTaskModalEdit = (task: any, values: any) => {
+  const taskEdit = jobData.tasks.find(
+    (item: any) => item.id === taskToEdit.value.id
+  );
+  if (taskEdit) {
+    taskEdit.value = JSON.stringify(values, null, "\t");
+  }
+};
+
+const onTaskEdit = (task: any) => {
+  isTaskModalOpen.value = true;
+  taskToEdit.value = task;
+};
 </script>
 
 <template>
   <Container>
-    <div class="flex space-x-4">
-      <!-- Chainlink Job Type Input Start -->
-      <Listbox as="div" v-model="jobData.jobType" class="w-1/2">
-        <div class="relative">
-          <ListboxButton
-            class="h-12 bg-white relative w-full border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:border-blue-500 sm:text-sm"
-          >
-            <span class="block truncate">{{ jobData.jobType.name }}</span>
-            <span
-              class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
-            >
-              <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
-            </span>
-          </ListboxButton>
+    <FormKit
+      type="form"
+      :actions="false"
+      :incomplete-message="false"
+      ref="dynamicForm"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="onSubmit()"
+    >
+      <div class="flex space-x-4">
+        <!-- Chainlink Job Type Input Start -->
+        <Listbox
+          v-model="jobData.jobType"
+          :list="jobTypes"
+          class="w-1/2 h-12"
+        />
+        <!-- Chainlink Job Type Input End -->
 
-          <transition
-            leave-active-class="transition ease-in duration-100"
-            leave-from-class="opacity-100"
-            leave-to-class="opacity-0"
-          >
-            <ListboxOptions
-              class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base focus:outline-none focus:border-blue-500 sm:text-sm"
-            >
-              <ListboxOption
-                as="template"
-                v-for="jobType in jobTypes"
-                :key="jobType.id"
-                :value="jobType"
-                v-slot="{ active, selected }"
-              >
-                <li
-                  :class="[
-                    active ? 'text-white bg-blue-600' : 'text-gray-900',
-                    'cursor-default select-none relative py-2 pl-3 pr-9',
-                  ]"
-                >
-                  <span
-                    :class="[
-                      selected ? 'font-semibold' : 'font-normal',
-                      'block truncate',
-                    ]"
-                  >
-                    {{ jobType.name }}
-                  </span>
+        <!-- Job Name Start -->
+        <FormKit
+          v-model="jobData.name"
+          name="jobName"
+          validation="required"
+          placeholder="Job name"
+          outer-class="$reset w-full"
+          inner-class="$reset h-12"
+          :config="{ validationVisibility: 'submit' }"
+        />
+        <!-- Job Name End -->
+      </div>
 
-                  <span
-                    v-if="selected"
-                    :class="[
-                      active ? 'text-white' : 'text-blue-600',
-                      'absolute inset-y-0 right-0 flex items-center pr-4',
-                    ]"
-                  >
-                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                  </span>
-                </li>
-              </ListboxOption>
-            </ListboxOptions>
-          </transition>
-        </div>
-      </Listbox>
-      <!-- Chainlink Job Type Input End -->
+      <div class="flex space-x-4 mt-4">
+        <!-- Request Method Input Start -->
+        <Listbox v-model="jobData.method" :list="methods" class="w-28 h-12" />
+        <!-- Request Method Input End -->
 
-      <!-- Job Name Start -->
-      <input
-        class="h-12 w-1/2 px-4 rounded-md border border-gray-300 shadow-sm focus:outline-none focus:border-blue-500"
-        placeholder="Job name"
-        v-model="jobData.name"
-      />
-      <!-- Job Name End -->
-    </div>
+        <!-- Request Url Start -->
 
-    <div class="flex mt-4">
-      <!-- Request Method Input Start -->
-      <Listbox as="div" v-model="jobData.method">
-        <div class="relative w-28">
-          <ListboxButton
-            class="h-12 bg-white relative w-full border border-gray-300 rounded-l-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:border-blue-500 sm:text-sm"
-          >
-            <span class="block truncate">{{ jobData.method.name }}</span>
-            <span
-              class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"
-            >
-              <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
-            </span>
-          </ListboxButton>
+        <FormKit
+          v-model="jobData.url"
+          name="URL"
+          validation="required|url"
+          placeholder="https://external-api.dev/api/example"
+          outer-class="$reset w-full"
+          inner-class="$reset h-12"
+          :config="{ validationVisibility: 'submit' }"
+        />
 
-          <transition
-            leave-active-class="transition ease-in duration-100"
-            leave-from-class="opacity-100"
-            leave-to-class="opacity-0"
-          >
-            <ListboxOptions
-              class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base focus:outline-none focus:border-blue-500 sm:text-sm"
-            >
-              <ListboxOption
-                as="template"
-                v-for="method in methods"
-                :key="method.id"
-                :value="method"
-                v-slot="{ active, selected }"
-              >
-                <li
-                  :class="[
-                    active ? 'text-white bg-blue-600' : 'text-gray-900',
-                    'cursor-default select-none relative py-2 pl-3 pr-9',
-                  ]"
-                >
-                  <span
-                    :class="[
-                      selected ? 'font-semibold' : 'font-normal',
-                      'block truncate',
-                    ]"
-                  >
-                    {{ method.name }}
-                  </span>
-
-                  <span
-                    v-if="selected"
-                    :class="[
-                      active ? 'text-white' : 'text-blue-600',
-                      'absolute inset-y-0 right-0 flex items-center pr-4',
-                    ]"
-                  >
-                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
-                  </span>
-                </li>
-              </ListboxOption>
-            </ListboxOptions>
-          </transition>
-        </div>
-      </Listbox>
-      <!-- Request Method Input End -->
-
-      <!-- Request Url Start -->
-      <input
-        class="h-12 w-full px-4 rounded-r-md border border-gray-300 shadow-sm focus:outline-none focus:border-blue-500"
-        placeholder="https://external-api.dev/api/example"
-        v-model="jobData.url"
-      />
-      <!-- Request Url End -->
-    </div>
+        <!-- Request Url End -->
+      </div>
+    </FormKit>
 
     <!-- Tabs Start -->
     <Tabs :tabs="tabs">
       <template #header="{ activeTab }">
-        <!-- Parameters Tab Header Start -->
+        <!-- Static Parameters Tab Header Start -->
         <button
           v-if="activeTab?.name === 'Static Parameters'"
           @click="addKeyValuePair(jobData.staticParms)"
           type="button"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          class="btn btn-primary"
         >
           <PlusIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
           <span class="hidden sm:block">Add</span>
         </button>
-        <!-- Parameters Tab Header End -->
+        <!-- Static Parameters Tab Header End -->
+
+        <!-- Dynamic Parameters Tab Header Start -->
+        <button
+          v-if="activeTab?.name === 'Dynamic Parameters'"
+          @click="addKeyValuePair(jobData.dynamicParms)"
+          type="button"
+          class="btn btn-primary"
+        >
+          <PlusIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
+          <span class="hidden sm:block">Add</span>
+        </button>
+        <!-- Dynamic Parameters Tab Header End -->
 
         <!-- Headers Tab Header Start -->
         <button
           v-if="activeTab?.name === 'Headers'"
           @click="addKeyValuePair(jobData.headers)"
           type="button"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          class="btn btn-primary"
         >
           <PlusIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
           <span class="hidden sm:block">Add</span>
@@ -368,7 +290,7 @@ const onTaskModalAdd = (task: any, values: any) => {
           v-if="activeTab?.name === 'Tasks'"
           @click="openTaskModal()"
           type="button"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          class="btn btn-primary"
         >
           <PlusIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
           <span class="hidden sm:block">Add</span>
@@ -380,7 +302,7 @@ const onTaskModalAdd = (task: any, values: any) => {
           v-if="activeTab?.name === 'Test'"
           @click="addKeyValuePair(jobData.headers)"
           type="button"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          class="btn btn-primary"
         >
           <CloudIcon class="sm:-ml-1 sm:mr-2 h-5 w-5" aria-hidden="true" />
           <span class="hidden sm:block">Test</span>
@@ -389,7 +311,7 @@ const onTaskModalAdd = (task: any, values: any) => {
       </template>
 
       <template #default="{ activeTab }">
-        <!-- Parameters Tab Start -->
+        <!-- Static Parameters Tab Start -->
         <div v-if="activeTab?.name === 'Static Parameters'">
           <KeyValueTable
             v-model="jobData.staticParms"
@@ -402,12 +324,29 @@ const onTaskModalAdd = (task: any, values: any) => {
             @click="addKeyValuePair(jobData.staticParms)"
           />
         </div>
-        <!-- Parameters Tab End -->
+        <!-- Static Parameters Tab End -->
+
+        <!-- Dynamic Parameters Tab Start -->
+        <div v-if="activeTab?.name === 'Dynamic Parameters'">
+          <KeyValueTable
+            v-model="jobData.dynamicParms"
+            v-if="jobData.dynamicParms.length != 0"
+            value-label="Mapping"
+            :hide-actions="['edit']"
+          />
+          <EmptyState
+            v-else
+            text="Add dynamic parameters to the request"
+            @click="addKeyValuePair(jobData.dynamicParms)"
+          />
+        </div>
+        <!-- Dynamic Parameters Tab End -->
 
         <!-- Tasks Tab Start -->
         <div v-if="activeTab?.name === 'Tasks'">
           <KeyValueTable
             key-label="Task"
+            :editCallback="onTaskEdit"
             :disable-inputs="true"
             v-model="jobData.tasks"
             v-if="jobData.tasks.length != 0"
@@ -451,87 +390,14 @@ const onTaskModalAdd = (task: any, values: any) => {
     </Tabs>
     <!-- Tabs End -->
 
-    <div class="mt-8">
-      <!-- Chain Input Start -->
-      <RadioGroup v-model="jobData.chain">
-        <RadioGroupLabel class="text-base font-medium text-gray-900">
-          Select a chain
-        </RadioGroupLabel>
+    <!-- Chain Input Start -->
+    <ChainRadioGroup class="mt-8" v-model="jobData.chain" />
+    <!-- Chain Input End -->
 
-        <div class="mt-4 grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-3">
-          <RadioGroupOption
-            as="template"
-            v-for="chain in chainStore.chains"
-            :key="chain.id"
-            :value="chain"
-            v-slot="{ checked, active }"
-          >
-            <div
-              :class="[
-                checked ? 'border-transparent' : 'border-gray-200',
-                active ? 'ring-2 ring-blue-500' : '',
-                'relative  bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none',
-              ]"
-            >
-              <div class="flex-1 flex">
-                <div class="flex flex-col">
-                  <RadioGroupLabel
-                    as="div"
-                    class="block text-sm font-medium text-gray-900"
-                  >
-                    <img
-                      :src="generalStore.getImage(chain.image)"
-                      class="block w-12 h-12 sm:h-16 sm:w-16"
-                    />
-
-                    <span class="block mt-4 text-gray-700">{{
-                      chain.name
-                    }}</span>
-                  </RadioGroupLabel>
-
-                  <RadioGroupDescription
-                    as="span"
-                    :class="{
-                      'bg-blue-100 text-blue-800': chain.is_mainnet,
-                      'bg-red-100 text-red-800': !chain.is_mainnet,
-                    }"
-                    class="mt-2 w-max inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
-                  >
-                    <span v-if="chain.is_mainnet">Mainnet</span>
-                    <span v-else>Testnet</span>
-                  </RadioGroupDescription>
-                </div>
-              </div>
-              <CheckCircleIcon
-                :class="[
-                  !checked ? 'invisible' : '',
-                  'h-5 w-5 text-indigo-600',
-                ]"
-                aria-hidden="true"
-              />
-              <div
-                :class="[
-                  active ? 'border' : 'border-2',
-                  checked ? 'border-blue-500' : 'border-transparent',
-                  'absolute -inset-px rounded-lg pointer-events-none',
-                ]"
-                aria-hidden="true"
-              />
-            </div>
-          </RadioGroupOption>
-        </div>
-      </RadioGroup>
-      <!-- Chain Input End -->
-    </div>
-
-    <div class="w-full mt-8">
+    <div class="w-full mt-8 hidden">
       <div class="flex items-center justify-between">
         <p class="text-lg font-medium text-gray-900">TOML Spec</p>
-        <button
-          @click="getTomlSpec()"
-          type="button"
-          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
+        <button @click="getTomlSpec()" type="button" class="btn btn-primary">
           <span class="block">Generate</span>
         </button>
       </div>
@@ -540,23 +406,21 @@ const onTaskModalAdd = (task: any, values: any) => {
 
     <div class="w-full mt-8">
       <button
-        @click="onSubmit()"
-        :disabled="!isValid"
+        @click="validateForm()"
         type="button"
-        :class="{
-          'hover:bg-blue-600': isValid,
-        }"
-        class="disabled:opacity-50 w-full h-12 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        class="disabled:opacity-50 btn btn-primary w-full"
       >
-        <span class="w-full">Create Job</span>
+        <span class="w-full">Deploy Job</span>
       </button>
     </div>
 
     <teleport to="body">
       <TaskModal
         :open="isTaskModalOpen"
+        :edit="taskToEdit"
         @close="onTaskModalClose()"
         @add="onTaskModalAdd"
+        @edit="onTaskModalEdit"
       />
     </teleport>
   </Container>

@@ -3,7 +3,7 @@ import { PlusCircleIcon } from "@heroicons/vue/outline";
 
 interface Props {
   text: string;
-  icon?: {};
+  icon?: any;
 }
 
 const { text, icon = PlusCircleIcon } = defineProps<Props>();
