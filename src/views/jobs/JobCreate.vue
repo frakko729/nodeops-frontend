@@ -147,7 +147,9 @@ const getTomlSpec = async () => {
     url: jobData.url,
     job_type_id: jobData.jobType.id,
     chain_id: jobData.chain.id,
-    parameters: JSON.stringify(jobData.staticParms),
+    static_parameters: JSON.stringify(jobData.staticParms),
+    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
+    tasks: JSON.stringify(jobData.tasks),
     headers: JSON.stringify(jobData.headers),
   });
 
@@ -394,7 +396,7 @@ const onTaskEdit = (task: any) => {
     <ChainRadioGroup class="mt-8" v-model="jobData.chain" />
     <!-- Chain Input End -->
 
-    <div class="w-full mt-8 hidden">
+    <div class="w-full mt-8">
       <div class="flex items-center justify-between">
         <p class="text-lg font-medium text-gray-900">TOML Spec</p>
         <button @click="getTomlSpec()" type="button" class="btn btn-primary">

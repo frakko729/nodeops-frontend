@@ -8,12 +8,22 @@ import "prismjs/components/prism-dot";
 
 <script setup lang="ts">
 import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
+import { ref, watch } from "vue";
 
 interface Props {
   input?: string;
 }
 
 const { input } = defineProps<Props>();
+
+const renderId = ref(1); // force re render, some prism bullshit
+
+watch(
+  () => input,
+  () => {
+    renderId.value++;
+  }
+);
 
 const toml = `type                = "directrequest"
 schemaVersion       = 1
@@ -36,22 +46,15 @@ observationSource   = """
 
     ds -> ds_parse -> ds_multiply
 """`;
-
-const dot = `
-    ds          [type="http" method=GET url="http://example.com"]
-    ds_parse    [type="jsonparse" path="USD"]
-    ds_multiply [type="multiply" times=100]
-
-    ds -> ds_parse -> ds_multiply`;
-
-const parsedDot = Prism.highlight(dot, Prism.languages.dot, "dot");
 </script>
 
 <template>
-  <div>
-    <code-highlight language="toml">
-      <pre v-if="input">{{ input }}</pre>
-      <pre v-else>{{ toml }}</pre>
+  <div :key="renderId">
+    <code-highlight language="toml" v-if="input">
+      {{ input }}
+    </code-highlight>
+    <code-highlight language="toml" v-else>
+      <pre>{{ toml }}</pre>
     </code-highlight>
   </div>
 </template>
