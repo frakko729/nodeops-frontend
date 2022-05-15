@@ -1,14 +1,11 @@
 <script lang="ts" setup>
-import { ref } from "vue";
 import { Switch } from "@headlessui/vue";
 
 interface Props {
-  modelValue: boolean;
+  modelValue: any;
 }
 
 const { modelValue } = defineProps<Props>();
-
-const emit = defineEmits(["update:modelValue"]);
 </script>
 
 <template>

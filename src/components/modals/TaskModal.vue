@@ -64,6 +64,55 @@ const tasks = reactive([
       },
     ],
   },
+  {
+    id: 4,
+    name: "ETH ABI Encode",
+    type: "ethabiencode",
+    inputs: [
+      {
+        $formkit: "text",
+        name: "abi",
+        label: "ABI",
+        help: "Canonical ETH ABI argument string e.g. fulfillRequest(bytes32 requestID, uint256 answer)",
+        validation: "required",
+      },
+      {
+        $formkit: "text",
+        name: "data",
+        label: "Data",
+        help: "Map of the values to be encoded.",
+        validation: "required|string",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "ETH Tx",
+    type: "ethtx",
+    inputs: [
+      {
+        $formkit: "text",
+        name: "to",
+        label: "To",
+        help: "The address of the contract to make a transaction to.",
+        validation: "required|string",
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: "ETH Call",
+    type: "ethcall",
+    inputs: [
+      {
+        $formkit: "text",
+        name: "contract",
+        label: "Contract",
+        help: "The address of the contract to call.",
+        validation: "required|string",
+      },
+    ],
+  },
 ]);
 
 /**
@@ -77,7 +126,7 @@ const taskForm = ref();
  */
 interface Props {
   open: boolean;
-  edit?: any;
+  edit: any;
 }
 const { open, edit } = defineProps<Props>();
 const emit = defineEmits(["close", "add", "edit"]);
@@ -93,7 +142,9 @@ watchEffect(() => {
     const editParsed = JSON.parse(edit.value);
 
     const task = tasks.find((item: any) => item.name === edit.key);
+
     if (task) {
+      selectedTask.value = task;
       Object.keys(editParsed).forEach((key: any) => {
         const input: any = task.inputs.find((item: any) => item.name === key);
         if (input) {
@@ -101,6 +152,10 @@ watchEffect(() => {
         }
       });
     }
+  } else {
+    selectedTask.value.inputs.forEach((input: any) => {
+      input.value = "";
+    });
   }
 });
 

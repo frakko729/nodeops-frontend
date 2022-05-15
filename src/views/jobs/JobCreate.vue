@@ -160,6 +160,7 @@ const isTaskModalOpen = ref(false);
 const taskToEdit = ref();
 
 const openTaskModal = () => {
+  taskToEdit.value = null;
   isTaskModalOpen.value = true;
 };
 
