@@ -22,7 +22,7 @@ chainStore.loadChains();
 </script>
 
 <template>
-  <RadioGroup v-model="modelValue" v-if="chainStore.chains">
+  <RadioGroup v-if="chainStore.chains" v-model="modelValue">
     <RadioGroupLabel class="text-base font-medium text-gray-900">
       Select a chain
     </RadioGroupLabel>
@@ -38,8 +38,10 @@ chainStore.loadChains();
       >
         <div
           :class="[
-            checked ? 'border-transparent' : 'border-gray-200',
-            active ? 'ring-2 ring-blue-500' : '',
+            modelValue.id === chain.id
+              ? 'border-transparent'
+              : 'border-gray-200',
+            modelValue.id === chain.id ? 'ring-2 ring-blue-500' : '',
             'relative  bg-white border rounded-lg shadow-sm p-4 flex cursor-pointer focus:outline-none',
           ]"
         >
@@ -71,13 +73,18 @@ chainStore.loadChains();
             </div>
           </div>
           <CheckCircleIcon
-            :class="[!checked ? 'invisible' : '', 'h-5 w-5 text-indigo-600']"
+            :class="[
+              !(modelValue.id === chain.id) ? 'invisible' : '',
+              'h-5 w-5 text-indigo-600',
+            ]"
             aria-hidden="true"
           />
           <div
             :class="[
-              active ? 'border' : 'border-2',
-              checked ? 'border-blue-500' : 'border-transparent',
+              modelValue.id === chain.id ? 'border' : 'border-2',
+              modelValue.id === chain.id
+                ? 'border-blue-500'
+                : 'border-transparent',
               'absolute -inset-px rounded-lg pointer-events-none',
             ]"
             aria-hidden="true"

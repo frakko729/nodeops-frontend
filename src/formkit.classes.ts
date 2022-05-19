@@ -18,6 +18,9 @@ const formkitClasses: Partial<any> = {
   number: {
     ...textStyle,
   },
+  select: {
+    ...textStyle,
+  },
 };
 
 export default formkitClasses;

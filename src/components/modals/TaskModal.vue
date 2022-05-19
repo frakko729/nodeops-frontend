@@ -70,46 +70,17 @@ const tasks = reactive([
     type: "ethabiencode",
     inputs: [
       {
-        $formkit: "text",
-        name: "abi",
+        $formkit: "select",
+        options: {
+          uint256: "uint256",
+          int256: "int256",
+          bytes32: "bytes32",
+          bool: "bool",
+        },
+        name: "type",
         label: "ABI",
-        help: "Canonical ETH ABI argument string e.g. fulfillRequest(bytes32 requestID, uint256 answer)",
+        help: "The type parsed into solidity",
         validation: "required",
-      },
-      {
-        $formkit: "text",
-        name: "data",
-        label: "Data",
-        help: "Map of the values to be encoded.",
-        validation: "required|string",
-      },
-    ],
-  },
-  {
-    id: 5,
-    name: "ETH Tx",
-    type: "ethtx",
-    inputs: [
-      {
-        $formkit: "text",
-        name: "to",
-        label: "To",
-        help: "The address of the contract to make a transaction to.",
-        validation: "required|string",
-      },
-    ],
-  },
-  {
-    id: 6,
-    name: "ETH Call",
-    type: "ethcall",
-    inputs: [
-      {
-        $formkit: "text",
-        name: "contract",
-        label: "Contract",
-        help: "The address of the contract to call.",
-        validation: "required|string",
       },
     ],
   },

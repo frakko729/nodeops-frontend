@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from "vue";
+import { computed, reactive, ref, watchEffect } from "vue";
 import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
 import Container from "@/components/Container.vue";
@@ -13,6 +13,7 @@ import EmptyState from "@/components/EmptyState.vue";
 import ChainRadioGroup from "@/components/ChainRadioGroup.vue";
 import Listbox from "@/components/Listbox.vue";
 import { useNotification } from "@/composables/notification";
+import { useRoute, useRouter } from "vue-router";
 
 /**
  * Static select data
@@ -43,6 +44,39 @@ const jobData = reactive({
   staticParms: [] as Array<Parms>,
   tasks: [] as Array<Parms>,
   headers: [] as Array<Parms>,
+});
+
+const route = useRoute();
+const jobId = ref();
+const {
+  get,
+  loading,
+  data: job,
+  overrideEndpoint,
+  error,
+} = useApi<any>("api/jobs/");
+
+const getApiData = async () => {
+  get().then(() => {
+    console.log(job.value);
+    jobData.name = job.value.name;
+    jobData.url = job.value.url;
+    jobData.chain = job.value.chain;
+    jobData.dynamicParms = JSON.parse(job.value.dynamic_parameters);
+    jobData.headers = JSON.parse(job.value.headers);
+    jobData.staticParms = JSON.parse(job.value.static_parameters);
+    jobData.tasks = JSON.parse(job.value.tasks);
+  });
+};
+
+watchEffect(() => {
+  if (route.params) {
+    jobId.value = route.params.jobId;
+    if (jobId.value) {
+      overrideEndpoint("api/jobs/" + jobId.value);
+      getApiData();
+    }
+  }
 });
 
 /**
@@ -115,8 +149,9 @@ const validateForm = () => {
 /**
  * Send data to backend
  */
+const router = useRouter();
 const onSubmit = async () => {
-  const { post, data, loading, error } = useApi("api/jobs");
+  const { post, data, loading, error } = useApi<any>("api/jobs");
   await post({
     name: jobData.name,
     method: jobData.method.name,
@@ -132,6 +167,7 @@ const onSubmit = async () => {
   if (data.value && !error.value) {
     const { showSuccess } = useNotification();
     showSuccess("Your job has been created successfully.");
+    router.push({ name: "job-detail", params: { jobId: data.value.id } });
   }
 };
 

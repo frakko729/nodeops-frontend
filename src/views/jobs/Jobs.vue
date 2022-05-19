@@ -8,8 +8,11 @@ import { FilterIcon, PlusIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 import Filter from "@/components/Filter.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
-import { useChainStore } from "@/stores/chainStore";
 import { useGeneralStore } from "@/stores/generalStore";
+import { useApi } from "@/composables/api";
+
+const { get, loading, data: jobs, error } = useApi<any>("api/jobs");
+get();
 
 const { randomIntArray } = useMath();
 
@@ -29,56 +32,8 @@ const x = [
   "13",
   "14",
 ];
-
-const chainStore = useChainStore();
-chainStore.loadChains();
-
-const jobs = [
-  {
-    url: "https://external-api.dev/api/example",
-    name: "Project ABC",
-    href: "/jobs/1",
-    status: "running",
-    chart: {
-      x: x,
-      y: randomIntArray(100, 200, 14),
-      z: randomIntArray(1, 1, 14),
-    },
-  },
-  {
-    url: "https://external-api.dev/api/example",
-    name: "NFT XYZ",
-    href: "/jobs/2",
-    status: "running",
-    chart: {
-      x: x,
-      y: randomIntArray(100, 300, 14),
-      z: randomIntArray(1, 1, 14),
-    },
-  },
-  {
-    url: "https://external-api.dev/api/example",
-    name: "Hackathon UVW",
-    href: "/jobs/3",
-    status: "warning",
-    chart: {
-      x: x,
-      y: randomIntArray(100, 200, 14),
-      z: randomIntArray(1, 2, 14),
-    },
-  },
-  {
-    url: "https://external-api.dev/api/example",
-    name: "Hackathon ERL",
-    href: "/jobs/4",
-    status: "error",
-    chart: {
-      x: x,
-      y: randomIntArray(0, 100, 14),
-      z: randomIntArray(1, 3, 14),
-    },
-  },
-];
+const y = randomIntArray(100, 200, 14);
+const z = randomIntArray(1, 1, 14);
 
 const router = useRouter();
 const onCreateJob = () => {
@@ -124,24 +79,25 @@ const generalStore = useGeneralStore();
     <Filter :show="showFilter" />
 
     <!-- Job list -->
-    <ul role="list" class="space-y-4 mt-4">
+    <ul role="list" class="space-y-4 mt-4" v-if="jobs">
       <li v-for="job in jobs" :key="job.name">
         <router-link
-          :to="job.href"
+          :to="{ name: 'job-detail', params: { jobId: job.id } }"
           class="h-full flex bg-white shadow hover:shadow-md overflow-hidden rounded-md group transition-all"
         >
           <div
             :class="{
-              'bg-green-400 group-hover:bg-green-500': job.status === 'running',
-              'bg-yellow-400 group-hover:bg-yellow-500':
-                job.status === 'warning',
-              'bg-red-400 group-hover:bg-red-500': job.status === 'error',
+              'bg-green-400 group-hover:bg-green-500': job.status === 1,
+              'bg-yellow-400 group-hover:bg-yellow-500': job.status === 0,
+              'bg-red-400 group-hover:bg-red-500': job.status === -1,
             }"
-            class="w-4 h-20 transition-colors rounded-l-md"
+            class="w-2 sm:w-4 h-20 transition-colors rounded-l-md"
           ></div>
-          <div class="flex items-center px-4 py-4 sm:px-2 w-full">
-            <div class="flex px-4 space-x-16 w-full">
-              <div class="w-2/6">
+          <div class="flex items-center px-0 py-4 sm:px-2 w-11/12 md:w-full">
+            <div
+              class="flex sm:flex-row px-4 space-x-8 md:space-x-8 lg:space-x-16 w-full"
+            >
+              <div class="w-3/6 md:w-4/12 lg:w-5/12">
                 <p class="text-sm font-medium text-gray-700 truncate">
                   {{ job.name }}
                 </p>
@@ -154,32 +110,30 @@ const generalStore = useGeneralStore();
                   <span class="truncate">{{ job.url }}</span>
                 </p>
               </div>
-              <div
-                class="flex space-x-4 w-1/6"
-                v-if="chainStore.chains.length != 0"
-              >
+              <div class="flex space-x-4 w-2/6 md:w-12">
                 <img
-                  :src="generalStore.getImage(chainStore.chains[0].image)"
+                  :src="generalStore.getImage(job.chain.image)"
                   class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
                 />
                 <div
-                  class="self-center h-max bg-blue-100 text-blue-800 w-max inline-flex items-center px-2 py-0 rounded-full text-xs font-medium"
+                  class="hidden sm:inline-flex self-center h-max bg-blue-100 text-blue-800 w-max items-center px-2 py-0 rounded-full text-xs font-medium"
                 >
-                  <span v-if="chainStore.chains[0].is_mainnet">Mainnet</span>
+                  <span v-if="job.chain.is_mainnet">Mainnet</span>
                   <span v-else>Testnet</span>
                 </div>
               </div>
-              <div class="w-2/6 flex h-max self-center">
-                <SimpleBarChart
-                  :x="job.chart.x"
-                  :y="job.chart.y"
-                  :z="job.chart.z"
-                  :width="200"
-                />
+              <div
+                class="md:w-5/12 lg:w-2/6 hidden md:flex md:h-max md:self-center md:justify-end"
+              >
+                <SimpleBarChart :x="x" :y="y" :z="z" :width="200" />
               </div>
-              <div class="w-1/6"></div>
+              <div class="w-20 sm:w-1/12 flex items-center">
+                <span class="text-gray-600 text-2xl leading-relaxed font-medium"
+                  >100%</span
+                >
+              </div>
             </div>
-            <div class="px-4">
+            <div class="md:px-2 lg:px-4">
               <ChevronRightIcon
                 class="h-5 w-5 text-gray-300 group-hover:text-gray-400 transition-colors"
                 aria-hidden="true"
