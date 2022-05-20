@@ -1,43 +1,61 @@
 <script setup lang="ts">
 import { Tab } from "@/interfaces/Tab";
-import { computed, reactive } from "vue";
+import { computed, ref, watch } from "vue";
 
 interface Props {
-  tabs: Array<Tab>;
+  modelValue: Array<Tab>;
 }
+const { modelValue } = defineProps<Props>();
+const emit = defineEmits(["update:modelValue"]);
 
-const { tabs } = defineProps<Props>();
-
-const reactiveTabs = reactive(tabs);
-
+/**
+ * Get active tab from model
+ */
 const activeTab = computed((): Tab | undefined =>
-  reactiveTabs.find((item) => item.current === true)
+  modelValue.find((item) => item.current === true)
 );
 
+/**
+ * On tab change emit event with updated values to parent
+ *
+ * @param tab
+ */
 const onTabChange = (tab: Tab) => {
   if (activeTab.value) {
     activeTab.value.current = false;
   }
-  const nextTab = reactiveTabs.find((item) => item.name === tab.name);
+  const nextTab = modelValue.find((item) => item.name === tab.name);
   if (nextTab) {
     nextTab.current = true;
   }
+  emit("update:modelValue", modelValue);
 };
+
+/**
+ * Mobile tab handling through select
+ */
+const select = ref(activeTab.value);
+
+watch(select, () => {
+  if (select.value) {
+    onTabChange(select.value);
+  }
+});
 </script>
 
 <template>
   <div class="mt-4">
     <div class="sm:hidden">
       <label for="tabs" class="sr-only">Select a tab</label>
-      <!-- Use an "onChange" listener to redirect the user to the selected tab URL. -->
       <select
-        id="tabs"
+        v-model="select"
         name="tabs"
         class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md transtion-all"
       >
         <option
-          v-for="tab in reactiveTabs"
+          v-for="tab in modelValue"
           :key="tab.name"
+          :value="tab"
           :selected="tab.current"
         >
           {{ tab.name }}
@@ -49,7 +67,7 @@ const onTabChange = (tab: Tab) => {
         <div class="flex justify-between items-center">
           <nav class="-mb-px flex space-x-8" aria-label="Tabs">
             <button
-              v-for="tab in reactiveTabs"
+              v-for="tab in modelValue"
               :key="tab.name"
               @click="onTabChange(tab)"
               :class="[
@@ -74,12 +92,12 @@ const onTabChange = (tab: Tab) => {
             </button>
           </nav>
 
-          <slot name="header" :activeTab="activeTab"> </slot>
+          <slot name="header"> </slot>
         </div>
       </div>
     </div>
     <div class="mt-4">
-      <slot :activeTab="activeTab"> </slot>
+      <slot> </slot>
     </div>
   </div>
 </template>

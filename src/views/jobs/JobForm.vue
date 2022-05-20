@@ -7,13 +7,13 @@ import Tabs from "../../components/Tabs.vue";
 import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
 import { useApi } from "@/composables/api";
-import TomlEditor from "@/components/TomlEditor.vue";
 import TaskModal from "../../components/modals/TaskModal.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import ChainRadioGroup from "@/components/ChainRadioGroup.vue";
 import Listbox from "@/components/Listbox.vue";
 import { useNotification } from "@/composables/notification";
 import { useRoute, useRouter } from "vue-router";
+import { useTabs } from "@/composables/tabs";
 
 /**
  * Static select data
@@ -89,7 +89,6 @@ const testRequest = () => {
 
 /**
  * Computed counts for tab
- * TODO don't count empty entries
  */
 const parmsStaticCount = computed((): number => jobData.staticParms.length);
 const parmsDynamicCount = computed((): number => jobData.dynamicParms.length);
@@ -99,24 +98,21 @@ const headersCount = computed((): number => jobData.headers.length);
 /**
  * Tabs definition
  */
-const tabs: Array<any> = [
+const { tabs, activeTab } = useTabs([
   {
     name: "Static Parameters",
-    href: "#",
     count: parmsStaticCount,
-
     current: true,
   },
   {
     name: "Dynamic Parameters",
-    href: "#",
     count: parmsDynamicCount,
     current: false,
   },
-  { name: "Headers", href: "#", count: headersCount, current: false },
-  { name: "Tasks", href: "#", count: tasksCount, current: false },
-  { name: "Test", href: "#", current: false },
-];
+  { name: "Headers", count: headersCount, current: false },
+  { name: "Tasks", count: tasksCount, current: false },
+  { name: "Test", current: false },
+]);
 
 /**
  * Adds new entry for parms or headers
@@ -169,27 +165,6 @@ const onSubmit = async () => {
     showSuccess("Your job has been created successfully.");
     router.push({ name: "job-detail", params: { jobId: data.value.id } });
   }
-};
-
-/**
- * Get toml spec from input
- */
-const tomlSpec = ref();
-const getTomlSpec = async () => {
-  const { post, data, loading, error } = useApi("api/jobs/toml");
-  await post({
-    name: jobData.name,
-    method: jobData.method.name,
-    url: jobData.url,
-    job_type_id: jobData.jobType.id,
-    chain_id: jobData.chain.id,
-    static_parameters: JSON.stringify(jobData.staticParms),
-    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
-    tasks: JSON.stringify(jobData.tasks),
-    headers: JSON.stringify(jobData.headers),
-  });
-
-  tomlSpec.value = data.value;
 };
 
 const isTaskModalOpen = ref(false);
@@ -286,8 +261,8 @@ const onTaskEdit = (task: any) => {
     </FormKit>
 
     <!-- Tabs Start -->
-    <Tabs :tabs="tabs">
-      <template #header="{ activeTab }">
+    <Tabs v-model="tabs">
+      <template #header>
         <!-- Static Parameters Tab Header Start -->
         <button
           v-if="activeTab?.name === 'Static Parameters'"
@@ -349,7 +324,7 @@ const onTaskEdit = (task: any) => {
         <!-- Test Tab Header End -->
       </template>
 
-      <template #default="{ activeTab }">
+      <template #default>
         <!-- Static Parameters Tab Start -->
         <div v-if="activeTab?.name === 'Static Parameters'">
           <KeyValueTable
@@ -432,16 +407,6 @@ const onTaskEdit = (task: any) => {
     <!-- Chain Input Start -->
     <ChainRadioGroup class="mt-8" v-model="jobData.chain" />
     <!-- Chain Input End -->
-
-    <div class="w-full mt-8">
-      <div class="flex items-center justify-between">
-        <p class="text-lg font-medium text-gray-900">TOML Spec</p>
-        <button @click="getTomlSpec()" type="button" class="btn btn-primary">
-          <span class="block">Generate</span>
-        </button>
-      </div>
-      <TomlEditor class="mt-4" :input="tomlSpec" />
-    </div>
 
     <div class="w-full mt-8">
       <button

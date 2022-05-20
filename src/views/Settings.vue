@@ -2,14 +2,15 @@
 import Container from "@/components/Container.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
 import Tabs from "@/components/Tabs.vue";
+import { useTabs } from "@/composables/tabs";
 import { useUserStore } from "@/stores/userStore";
 import { MailIcon } from "@heroicons/vue/solid";
 import { ref } from "vue";
 
-const tabs: Array<any> = [
+const { tabs, activeTab } = useTabs([
   { name: "General", current: true },
   { name: "Notifications", current: false },
-];
+]);
 
 const userStore = useUserStore();
 const emailModel = ref(userStore.email);
@@ -27,7 +28,7 @@ const onProfileSubmit = async () => {
     <SectionHeader title="Settings" />
 
     <!-- Tabs -->
-    <Tabs :tabs="tabs" v-slot="{ activeTab }">
+    <Tabs v-model="tabs">
       <div class="bg-white rounded-md shadow">
         <!-- Tab General -->
         <div v-if="activeTab?.name === 'General'">
