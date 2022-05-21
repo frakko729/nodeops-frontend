@@ -97,7 +97,7 @@ const { randomIntArray } = useMath(); // generates dummy data for the chart
             <Clipboard
               title="Job Id"
               v-if="job.external_job_id"
-              :source="job.external_job_id"
+              :source="job.external_job_id.replace(/-/g, '')"
               class="absolute -right-10 top-5"
             />
           </div>
