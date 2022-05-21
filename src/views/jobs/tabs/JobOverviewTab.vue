@@ -96,8 +96,8 @@ const { randomIntArray } = useMath(); // generates dummy data for the chart
             </dd>
             <Clipboard
               title="Job Id"
-              v-if="job.node?.oracle_address"
-              :source="job.node.oracle_address"
+              v-if="job.external_job_id"
+              :source="job.external_job_id"
               class="absolute -right-10 top-5"
             />
           </div>

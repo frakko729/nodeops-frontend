@@ -65,7 +65,12 @@ const onCreateJob = () => {
     <SectionHeader title="Dashboard" />
     <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       <!-- Stat list -->
-      <StatCard v-for="(item, id) in stats" :stat="item" :key="id" />
+      <StatCard
+        class="col-span-3 sm:col-span-1"
+        v-for="(item, id) in stats"
+        :stat="item"
+        :key="id"
+      />
 
       <!-- Bar Chart -->
 

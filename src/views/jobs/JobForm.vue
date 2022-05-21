@@ -59,7 +59,6 @@ const {
 
 const getApiData = async () => {
   get().then(() => {
-    console.log(job.value);
     jobData.name = job.value.name;
     jobData.url = job.value.url;
     jobData.chain = job.value.chain;
@@ -149,7 +148,7 @@ const dynamicForm = ref();
 const validateForm = () => {
   if (dynamicForm.value) {
     const node = dynamicForm.value.node;
-    node.submit();
+    return node.submit();
   }
 };
 
@@ -159,17 +158,20 @@ const validateForm = () => {
 const router = useRouter();
 const onSubmit = async () => {
   const { post, data, loading, error } = useApi<any>("api/jobs");
-  await post({
-    name: jobData.name,
-    method: jobData.method.name,
-    url: jobData.url,
-    job_type_id: jobData.jobType.id,
-    chain_id: jobData.chain.id,
-    static_parameters: JSON.stringify(jobData.staticParms),
-    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
-    tasks: JSON.stringify(jobData.tasks),
-    headers: JSON.stringify(jobData.headers),
-  });
+
+  try {
+    await post({
+      name: jobData.name,
+      method: jobData.method.name,
+      url: jobData.url,
+      job_type_id: jobData.jobType.id,
+      chain_id: jobData.chain.id,
+      static_parameters: JSON.stringify(jobData.staticParms),
+      dynamic_parameters: JSON.stringify(jobData.dynamicParms),
+      tasks: JSON.stringify(jobData.tasks),
+      headers: JSON.stringify(jobData.headers),
+    });
+  } catch (err) {}
 
   if (data.value && !error.value) {
     const { showSuccess } = useNotification();
@@ -227,6 +229,7 @@ const onTaskEdit = (task: any) => {
     />
 
     <FormKit
+      id="form"
       type="form"
       :actions="false"
       :incomplete-message="false"
@@ -265,7 +268,7 @@ const onTaskEdit = (task: any) => {
 
         <FormKit
           v-model="jobData.url"
-          name="URL"
+          name="url"
           validation="required|url"
           placeholder="https://external-api.dev/api/example"
           outer-class="$reset w-full"
