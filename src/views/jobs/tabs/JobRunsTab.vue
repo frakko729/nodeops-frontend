@@ -1,12 +1,35 @@
 <script setup lang="ts">
 import { TableIcon } from "@heroicons/vue/solid";
 import EmptyState from "@/components/EmptyState.vue";
+import CodeModal from "@/components/modals/CodeModal.vue";
+import { useToggle } from "@vueuse/core";
+import { ref } from "vue";
+import { inputs } from "@formkit/inputs";
 
 interface Props {
   job: any;
   runs: Array<any>;
 }
 const { job, runs } = defineProps<Props>();
+
+const isToggled = ref(false);
+const codeInput = ref("");
+
+const onInput = (run: any) => {
+  isToggled.value = true;
+
+  codeInput.value = run.inputs;
+};
+
+const onOutput = (run: any) => {
+  isToggled.value = true;
+  codeInput.value = run.outputs;
+};
+
+const onErrors = (run: any) => {
+  isToggled.value = true;
+  codeInput.value = run.errors;
+};
 </script>
 
 <template>
@@ -61,17 +84,40 @@ const { job, runs } = defineProps<Props>();
             {{ id + 1 }}
           </td>
           <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-            <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+            <button
+              @click="onInput(run)"
+              class="text-blue-600 hover:text-blue-900"
+            >
+              View
+            </button>
           </td>
           <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-            <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+            <button
+              @click="onOutput(run)"
+              class="text-blue-600 hover:text-blue-900"
+            >
+              View
+            </button>
           </td>
           <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-            <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
+            <button
+              @click="onErrors(run)"
+              class="text-blue-600 hover:text-blue-900"
+            >
+              View
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+
+    <teleport to="body">
+      <CodeModal
+        :open="isToggled"
+        :input="codeInput"
+        @close="isToggled = false"
+      />
+    </teleport>
   </div>
   <div v-else>
     <EmptyState

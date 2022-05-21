@@ -21,7 +21,7 @@ const randomIntArray = (
   length: number
 ): Array<number> => {
   const array: Array<number> = [];
-  for (let i = 0; i < length; i++) {
+  for (let i = 0; i <= length; i++) {
     array.push(randomInt(min, max));
   }
   return array;

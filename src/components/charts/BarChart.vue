@@ -33,16 +33,18 @@ const {
 const xRange = [marginLeft, width - marginRight]; // [left, right]
 const xDomain = new d3.InternSet(x); // an array of (ordinal) x-values
 const yRange = [height - marginBottom, marginTop]; // [bottom, top]
-const yDomain = [0, d3.max(y)]; // [ymin, ymax]
+const yDomain = [0, d3.max(y) == 0 ? 100 : d3.max(y)]; // [ymin, ymax]
 
 const svgRef = ref();
 
 // Construct scales, axes, and formats.
 const xScale = d3.scaleBand(xDomain, xRange).padding(xPadding);
+
 const yScale = yType(yDomain, yRange);
 const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
 const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
 
+yDomain;
 onMounted(() => {
   const svg = d3
     .select(svgRef.value)

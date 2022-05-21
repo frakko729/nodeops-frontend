@@ -5,6 +5,23 @@ import "vue-code-highlight/themes/window.css";
 
 <script setup lang="ts">
 import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
+import { ref, watch } from "vue";
+
+interface Props {
+  input?: string;
+}
+
+const { input } = defineProps<Props>();
+
+const renderId = ref(1); // force re render, some prism bullshit
+
+watch(
+  () => input,
+  () => {
+    renderId.value++;
+  }
+);
+
 const headers = `HTTP/1.1 200 OK
 Host: localhost
 Date: Thu, 05 May 2022 10:38:29 GMT
@@ -37,8 +54,11 @@ const string = JSON.stringify(json, null, 4);
 </script>
 
 <template>
-  <div>
-    <code-highlight language="javascript">
+  <div :key="renderId">
+    <code-highlight language="javascript" v-if="input">
+      <pre>{{ JSON.stringify(JSON.parse(input), null, 4) }}</pre>
+    </code-highlight>
+    <code-highlight language="javascript" v-else>
       <pre
         >{{ headers }}{{ string }}
     </pre

@@ -43,8 +43,7 @@ const onProfileSubmit = async () => {
                 Profile
               </h3>
               <p class="max-w-2xl text-sm text-gray-500">
-                This information will be displayed publicly so be careful what
-                you share.
+                This information will be used for contacting you.
               </p>
             </div>
 

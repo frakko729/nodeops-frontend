@@ -33,17 +33,23 @@ const navigation: Array<any> = reactive([
   { name: "Reports", icon: ChartBarIcon, to: "reports", current: false },
 ]);
 
-const onNavigationChange = (array: Array<any>, newVal: any, oldVal: any) => {
-  if (oldVal) {
-    const found = array.find((item) => item.to === oldVal);
+const onNavigationChange = (
+  array: Array<any>,
+  newRoute: any,
+  oldRoute: any
+) => {
+  if (newRoute) {
+    const found = array.find(
+      (item) => item.to === newRoute.name || item.to == newRoute.meta.parent
+    );
+
     if (found) {
-      found.current = false;
-    }
-  }
-  if (newVal) {
-    const found2 = array.find((item) => item.to === newVal);
-    if (found2) {
-      found2.current = true;
+      const old = navigation.find((item: any) => item.current === true);
+      if (old) {
+        old.current = false;
+      }
+
+      found.current = true;
     }
   }
 };
@@ -52,11 +58,11 @@ const route = useRoute();
 
 watchEffect(() => {
   if (route) {
-    onNavigationChange(navigation, route.name, "");
+    onNavigationChange(navigation, route, "");
   }
 });
 watch(
-  () => route.name,
+  () => route,
   (newVal, oldVal) => {
     onNavigationChange(navigation, newVal, oldVal);
   }

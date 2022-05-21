@@ -98,7 +98,7 @@ const onDeleteConfirm = async () => {
           <div class="sm:flex sm:space-x-5 space-y-4 sm:space-y-0">
             <div class="flex-shrink-0">
               <img
-                class="mx-auto h-20 w-20 rounded-full"
+                class="mx-auto h-16 w-16 rounded-full"
                 :src="generalStore.getImage(job.chain.image)"
               />
             </div>

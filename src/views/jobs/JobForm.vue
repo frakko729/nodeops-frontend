@@ -14,6 +14,7 @@ import Listbox from "@/components/Listbox.vue";
 import { useNotification } from "@/composables/notification";
 import { useRoute, useRouter } from "vue-router";
 import { useTabs } from "@/composables/tabs";
+import Alert from "../../components/Alert.vue";
 
 /**
  * Static select data
@@ -76,6 +77,16 @@ watchEffect(() => {
       overrideEndpoint("api/jobs/" + jobId.value);
       getApiData();
     }
+  }
+});
+
+/**
+ * New user message
+ */
+const isNewUser = ref(false);
+watchEffect(() => {
+  if (route.query && route.query.new) {
+    isNewUser.value = true;
   }
 });
 
@@ -209,6 +220,12 @@ const onTaskEdit = (task: any) => {
 
 <template>
   <Container>
+    <Alert
+      text="You don't have any jobs, create your first one in just a few clicks."
+      v-if="isNewUser"
+      class="mb-4"
+    />
+
     <FormKit
       type="form"
       :actions="false"
@@ -314,7 +331,7 @@ const onTaskEdit = (task: any) => {
         <!-- Test Tab Header Start -->
         <button
           v-if="activeTab?.name === 'Test'"
-          @click="addKeyValuePair(jobData.headers)"
+          @click="testRequest()"
           type="button"
           class="btn btn-primary"
         >

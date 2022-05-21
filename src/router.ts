@@ -38,21 +38,21 @@ const routes: Array<RouteRecordRaw> = [
     name: "job-create",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobForm.vue"),
-    meta: { requiresAuth: true, layout: AppLayout },
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {
     path: "/jobs/:jobId",
     name: "job-detail",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobDetail.vue"),
-    meta: { requiresAuth: true, layout: AppLayout },
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {
     path: "/jobs/:jobId/edit",
     name: "job-edit",
     component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobForm.vue"),
-    meta: { requiresAuth: true, layout: AppLayout },
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {
     path: "/nodes",
@@ -66,7 +66,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "node-detail",
     component: () =>
       import(/* webpackChunkName: "nodes" */ "@/views/nodes/NodeDetail.vue"),
-    meta: { requiresAuth: true, layout: AppLayout },
+    meta: { requiresAuth: true, layout: AppLayout, parent: "nodes" },
   },
   {
     path: "/reports",
@@ -120,7 +120,7 @@ router.beforeEach((to, from) => {
    * Check if route requires auth
    */
   if (to.meta.requiresAuth && !userStore.isAuthenticated) {
-    //return { name: "landing-page" }; // TODO add for production
+    return { name: "landing-page" };
   }
 
   /**

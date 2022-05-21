@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { TableIcon } from "@heroicons/vue/solid";
 import EmptyState from "@/components/EmptyState.vue";
+import { useDayjs } from "@/composables/dayjs";
+
+const { getDaysFromPast, format } = useDayjs();
 
 interface Props {
   job: any;
@@ -21,10 +24,7 @@ const { job, errors } = defineProps<Props>();
             scope="col"
             class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
           >
-            Error
-          </th>
-          <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-            <span class="sr-only">Edit</span>
+            Errors
           </th>
         </tr>
       </thead>
@@ -36,7 +36,8 @@ const { job, errors } = defineProps<Props>();
               scope="colgroup"
               class="bg-gray-50 px-4 py-2 text-left text-sm font-semibold text-gray-900 sm:px-6"
             >
-              Run {{ id + 1 }} at {{ errorGroup.finished_at }}
+              Run {{ id + 1 }} from {{ format(errorGroup.finished_at) }} has
+              {{ JSON.parse(errorGroup.errors).length }} errors
             </th>
           </tr>
           <tr
@@ -51,12 +52,6 @@ const { job, errors } = defineProps<Props>();
               class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6"
             >
               {{ error }}
-            </td>
-
-            <td
-              class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"
-            >
-              <a href="#" class="text-blue-600 hover:text-blue-900">View</a>
             </td>
           </tr>
         </template>
