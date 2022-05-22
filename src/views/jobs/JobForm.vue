@@ -157,26 +157,42 @@ const validateForm = () => {
  */
 const router = useRouter();
 const onSubmit = async () => {
-  const { post, data, loading, error } = useApi<any>("api/jobs");
+  const { post, put, data, loading, error, overrideEndpoint } =
+    useApi<any>("api/jobs");
 
-  try {
-    await post({
-      name: jobData.name,
-      method: jobData.method.name,
-      url: jobData.url,
-      job_type_id: jobData.jobType.id,
-      chain_id: jobData.chain.id,
-      static_parameters: JSON.stringify(jobData.staticParms),
-      dynamic_parameters: JSON.stringify(jobData.dynamicParms),
-      tasks: JSON.stringify(jobData.tasks),
-      headers: JSON.stringify(jobData.headers),
-    });
-  } catch (err) {}
+  const payload = {
+    name: jobData.name,
+    method: jobData.method.name,
+    url: jobData.url,
+    job_type_id: jobData.jobType.id,
+    chain_id: jobData.chain.id,
+    static_parameters: JSON.stringify(jobData.staticParms),
+    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
+    tasks: JSON.stringify(jobData.tasks),
+    headers: JSON.stringify(jobData.headers),
+  };
 
-  if (data.value && !error.value) {
-    const { showSuccess } = useNotification();
-    showSuccess("Your job has been created successfully.");
-    router.push({ name: "job-detail", params: { jobId: data.value.id } });
+  if (!jobId.value) {
+    try {
+      await post(payload);
+    } catch (err) {}
+
+    if (data.value && !error.value) {
+      const { showSuccess } = useNotification();
+      showSuccess("Your job has been created successfully.");
+      router.push({ name: "job-detail", params: { jobId: data.value.id } });
+    }
+  } else {
+    try {
+      overrideEndpoint("api/jobs/" + jobId.value);
+      await put(payload);
+    } catch (err) {}
+
+    if (data.value && !error.value) {
+      const { showSuccess } = useNotification();
+      showSuccess("Your job has been updated successfully.");
+      router.push({ name: "job-detail", params: { jobId: data.value.id } });
+    }
   }
 };
 
