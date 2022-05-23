@@ -1,9 +1,5 @@
-<script lang="ts">
-import Prism from "prismjs";
-import "vue-code-highlight/themes/window.css";
-</script>
-
 <script setup lang="ts">
+import "vue-code-highlight/themes/window.css";
 import CodeHighlight from "vue-code-highlight/src/CodeHighlight.vue";
 import { ref, watch } from "vue";
 
