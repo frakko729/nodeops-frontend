@@ -1,8 +1,6 @@
 import { markRaw } from "vue";
 import { useNotification } from "./../composables/notification";
 import { defineStore } from "pinia";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 import { ethers } from "ethers";
 import { useApi } from "@/composables/api";
 import { JsonRpcSigner, Web3Provider } from "@ethersproject/providers";
