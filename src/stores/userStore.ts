@@ -1,6 +1,8 @@
 import { markRaw } from "vue";
 import { useNotification } from "./../composables/notification";
 import { defineStore } from "pinia";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import { ethers } from "ethers";
 import { useApi } from "@/composables/api";
 import { JsonRpcSigner, Web3Provider } from "@ethersproject/providers";
@@ -55,11 +57,51 @@ export const useUserStore = defineStore("user", {
         this.isWeb3Connected = false;
       }
     },
+    async connectWeb3Modal() {
+      try {
+        const providerOptions = {
+          walletconnect: {
+            package: WalletConnectProvider, // required
+            options: {
+              infuraId: "b1e07b5ba6fc4b6ebc64fbe70755250d", // required
+            },
+          },
+        };
+
+        const web3Modal = new Web3Modal({
+          network: "mainnet", // optional
+          cacheProvider: true, // optional
+          providerOptions, // required
+        });
+
+        const instance = await web3Modal.connect();
+
+        this.provider = markRaw(new ethers.providers.Web3Provider(instance));
+
+        if (this.provider) {
+          // MetaMask requires requesting permission to connect users accounts
+          await this.provider.send("eth_requestAccounts", []);
+
+          // The MetaMask plugin also allows signing transactions to
+          // send ether and pay to change state within the blockchain.
+          // For this, you need the account signer...
+          this.signer = this.provider.getSigner();
+
+          if (this.signer) {
+            this.address = await this.signer.getAddress();
+            this.isWeb3Connected = true;
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        this.isWeb3Connected = false;
+      }
+    },
     async login() {
       const { showError } = useNotification();
       try {
         // create web3 connectivity
-        await this.connectWeb3();
+        await this.connectWeb3Modal();
 
         // get csrf cookie for authentication  https://laravel.com/docs/9.x/sanctum#spa-authenticating
         const { get: getCsrfCookie } = useApi("sanctum/csrf-cookie");
