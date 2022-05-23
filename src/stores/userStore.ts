@@ -56,6 +56,7 @@ export const useUserStore = defineStore("user", {
       }
     },
     async login() {
+      const { showError } = useNotification();
       try {
         // create web3 connectivity
         await this.connectWeb3();
@@ -88,10 +89,12 @@ export const useUserStore = defineStore("user", {
         } else {
           console.log(error.value);
           this.isAuthenticated = false;
+          showError();
         }
       } catch (error) {
         console.log(error);
         this.isAuthenticated = false;
+        showError();
       }
     },
     async loginFromToken(redirect: string) {
