@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, reactive, ref, watchEffect } from "vue";
+import { computed, reactive, ref, watch, watchEffect } from "vue";
 import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
 import Container from "@/components/Container.vue";
@@ -14,6 +14,7 @@ import Listbox from "@/components/Listbox.vue";
 import { useNotification } from "@/composables/notification";
 import { useRoute, useRouter } from "vue-router";
 import { useTabs } from "@/composables/tabs";
+import { useUrl } from "@/composables/url";
 import Alert from "../../components/Alert.vue";
 
 /**
@@ -93,8 +94,23 @@ watchEffect(() => {
  * TODO Test the request
  */
 const testResult = ref();
-const testRequest = () => {
-  testResult.value = "test";
+const testRequest = async () => {
+  const { post, put, data, loading, error } = useApi<any>("api/jobs/ea");
+
+  const payload = {
+    name: "test",
+    method: jobData.method.name,
+    url: jobData.url,
+    job_type_id: jobData.jobType.id,
+    chain_id: 1,
+    static_parameters: JSON.stringify(jobData.staticParms),
+    dynamic_parameters: JSON.stringify(jobData.dynamicParms),
+    tasks: JSON.stringify(jobData.tasks),
+    headers: JSON.stringify(jobData.headers),
+  };
+
+  await post(payload);
+  testResult.value = JSON.stringify(data.value);
 };
 
 /**
@@ -129,7 +145,7 @@ const { tabs, activeTab } = useTabs([
  *
  * @param appendTo
  */
-const addKeyValuePair = (appendTo: Array<any>) => {
+const addKeyValuePair = (appendTo: Array<any>, key?: any, value?: any) => {
   let id = 0;
 
   if (appendTo.length !== 0) {
@@ -137,11 +153,29 @@ const addKeyValuePair = (appendTo: Array<any>) => {
   }
   appendTo.push({
     id: id,
-    key: "",
-    value: "",
+    key: key || "",
+    value: value || "",
     isActive: true,
   });
 };
+
+const { getJsonFromUrl } = useUrl();
+
+watch(
+  () => jobData.url,
+  () => {
+    const parms = getJsonFromUrl(jobData.url);
+
+    if (typeof parms === "object" && parms !== null) {
+      Object.entries(parms).forEach((parm) => {
+        const [key, value] = parm;
+        addKeyValuePair(jobData.staticParms, key, value);
+      });
+
+      jobData.url = jobData.url.split("?")[0];
+    }
+  }
+);
 
 const dynamicForm = ref();
 
@@ -427,7 +461,7 @@ const onTaskEdit = (task: any) => {
 
         <!-- Test Tab Start -->
         <div v-if="activeTab?.name === 'Test'">
-          <JsonOutput v-if="testResult" />
+          <JsonOutput v-if="testResult" :input="testResult" />
           <EmptyState
             :icon="CloudOutlineIcon"
             v-else

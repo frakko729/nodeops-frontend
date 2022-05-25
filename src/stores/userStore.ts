@@ -31,6 +31,7 @@ export const useUserStore = defineStore("user", {
   },
   actions: {
     async connectWeb3() {
+      const { showError } = useNotification();
       try {
         // create ethers provider by windows ethereum object
         const { ethereum } = window;
@@ -49,10 +50,13 @@ export const useUserStore = defineStore("user", {
             this.address = await this.signer.getAddress();
             this.isWeb3Connected = true;
           }
+        } else {
+          showError("No web3 provider found.");
         }
       } catch (error) {
         console.log(error);
         this.isWeb3Connected = false;
+        showError();
       }
     },
     async login() {

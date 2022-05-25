@@ -32,8 +32,7 @@ const features = [
   },
   {
     name: "Multichain support",
-    description:
-      "Support for all popular blockchains and their testnets.",
+    description: "Support for all popular blockchains and their testnets.",
     icon: ArrowsExpandIcon,
   },
   {
@@ -116,8 +115,16 @@ const footerNavigation = {
                   <p
                     class="text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl"
                   >
-                    Node Ops lets Chainlink developers run their Jobs on-demand. A developer can host their job on a blockchain of their choice with the click of a button. <br>
-Our mission: Creating a job for your EA should be a just a few clicks.
+                    Node Ops lets Chainlink developers run their Jobs on-demand.
+                    A developer can host their job on a blockchain of their
+                    choice with the click of a button.
+                  </p>
+
+                  <p
+                    class="text-base mt-2 text-gray-300 sm:text-xl lg:text-lg xl:text-xl"
+                  >
+                    Our mission: Creating a job for your EA should be a just a
+                    few clicks.
                   </p>
 
                   <div
@@ -164,7 +171,8 @@ Our mission: Creating a job for your EA should be a just a few clicks.
                 No Chainlink node? No problem.
               </p>
               <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
-               Run your jobs on NodeOps. You pick the blockchain and we run your Chainlink Job.
+                Run your jobs on NodeOps. You pick the blockchain and we run
+                your Chainlink Job.
               </p>
             </div>
             <div class="mt-12 -mb-10 sm:-mb-24 lg:-mb-80">
@@ -193,8 +201,9 @@ Our mission: Creating a job for your EA should be a just a few clicks.
               Everything you need for your API on Chainlink
             </p>
             <p class="mt-5 max-w-prose mx-auto text-xl text-gray-500">
-              Developers only create their External Adapters to bring data to blockchain. Your Chainlink Jobs will be run on our nodes.  
-	    </p>
+              Developers only create their External Adapters to bring data to
+              blockchain. Your Chainlink Jobs will be run on our nodes.
+            </p>
             <div class="mt-12">
               <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 <div
@@ -261,12 +270,14 @@ Our mission: Creating a job for your EA should be a just a few clicks.
                 We’re here to help
               </p>
               <p class="mt-3 text-lg text-gray-300">
-                We plan to support all blockchains and testnets. Please feel free to reach out to us for feature requests and suggestions.
+                We plan to support all blockchains and testnets. Please feel
+                free to reach out to us for feature requests and suggestions.
               </p>
               <div class="mt-8">
                 <div class="inline-flex rounded-md shadow">
                   <a
-                    href="#"
+                    target="_blank"
+                    href="https://discord.gg/txStfV3gRw"
                     class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-gray-900 bg-white hover:bg-gray-50"
                   >
                     Join our Discord
