@@ -72,10 +72,10 @@ const onErrors = (run: any) => {
           <td class="whitespace-nowrap px-5">
             <span
               :class="{
-                'bg-red-400': run.status === 0,
-                'bg-green-400': run.status === 1,
+                'bg-red-400': run.status == 0,
+                'bg-green-400': run.status == 1,
               }"
-              class="w-5 h-5 rounded-full bg-gray-500 block"
+              class="w-5 h-5 rounded-full block"
             ></span>
           </td>
           <td
