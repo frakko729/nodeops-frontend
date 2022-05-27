@@ -14,7 +14,7 @@ const generalStore = useGeneralStore();
   <Container>
     <SectionHeader title="Nodes"></SectionHeader>
 
-    <div v-if="data && !loading" class="mt-5">
+    <div v-if="data && !loading" class="mt-5 flex flex-col space-y-6">
       <div v-for="node in data" :key="node.id" class="flex flex-col">
         <div class="rounded-lg bg-white overflow-hidden shadow">
           <div class="bg-white p-6">
