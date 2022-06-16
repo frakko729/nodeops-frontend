@@ -24,6 +24,10 @@
 @tailwind utilities;
 
 
+.formkit-messages[aria-live=assertive]{
+  display: none;
+}
+
 @font-face {
   font-family: "Inter";
   font-style: normal;

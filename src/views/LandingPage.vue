@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { defineComponent, h, markRaw } from "vue";
+import { defineComponent, h, markRaw, ref } from "vue";
 import LandingPageHero from "@/assets/svgs/landing-page-hero.svg";
 import LandingPageScreenshot from "@/assets/landinpage-screenshot.jpg";
+import LandingPageCreateScreenshot from "@/assets/landinpage-create-screenshot.png";
 import { Popover } from "@headlessui/vue";
 import {
   CogIcon,
   LightningBoltIcon,
+  ChevronRightIcon,
   ArrowsExpandIcon,
   ChartBarIcon,
   ServerIcon,
@@ -15,6 +17,8 @@ import Discord from "@/assets/svgs/discord-brands.svg";
 import { ExternalLinkIcon } from "@heroicons/vue/solid";
 import Logo from "@/components/Logo.vue";
 import { useUserStore } from "@/stores/userStore";
+import { useApi } from "@/composables/api";
+import { useNotification } from "@/composables/notification";
 
 const userStore = useUserStore();
 const features = [
@@ -78,6 +82,21 @@ const footerNavigation = {
     },
   ],
 };
+
+const email = ref<string>("");
+const { post, loading, data, error } = useApi<any>("api/email");
+
+const onNotifyMe = async () => {
+  if (email.value) {
+    await post({ email: email.value });
+    const { showError, showSuccess } = useNotification();
+    if (!error.value) {
+      showSuccess("You get notified when it’s ready.");
+    } else {
+      showError();
+    }
+  }
+};
 </script>
 
 <template>
@@ -90,12 +109,146 @@ const footerNavigation = {
             aria-label="Global"
           >
             <Logo mode="white" class="text-white h-14" />
+
+            <div>
+              <button
+                @click="userStore.login()"
+                class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-offset-blue-900 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Early access
+              </button>
+            </div>
           </nav>
         </div>
       </Popover>
       <main>
+        <div class="bg-gray-900 pb-8 sm:pb-12 lg:pb-12">
+          <div class="pt-8 overflow-hidden sm:pt-12 lg:relative lg:py-48">
+            <div
+              class="mx-auto max-w-md px-4 sm:max-w-3xl sm:px-6 lg:px-8 lg:max-w-7xl lg:grid lg:grid-cols-2 lg:gap-24"
+            >
+              <div>
+                <div class="mt-8">
+                  <div class="mt-6 sm:max-w-xl">
+                    <h1
+                      class="mt-4 text-4xl tracking-tight font-extrabold text-white sm:mt-5 sm:text-6xl lg:mt-6 xl:text-6xl"
+                    >
+                      <span class="block">A better way to</span>
+                      <span
+                        class="pb-3 block bg-clip-text text-transparent bg-gradient-to-r from-blue-200 to-blue-400 sm:pb-5"
+                        >handle Chainlink</span
+                      >
+                    </h1>
+                    <p
+                      class="mt-2 text-base text-gray-300 sm:text-xl lg:text-lg xl:text-xl"
+                    >
+                      Node Ops lets Chainlink developers run their Jobs
+                      on-demand. A developer can host their job on a blockchain
+                      of their choice with the click of a button.
+                    </p>
+                  </div>
+
+                  <p class="mt-8 text-base font-medium text-gray-200">
+                    Sign up to get notified when it’s ready.
+                  </p>
+
+                  <FormKit
+                    type="form"
+                    :actions="false"
+                    @submit="onNotifyMe()"
+                    #default="{ state: { valid } }"
+                    :config="{ preserveErrors: false }"
+                  >
+                    <div class="mt-3 sm:max-w-lg sm:w-full sm:flex">
+                      <div class="min-w-0 flex-1">
+                        <label for="hero-email" class="sr-only"
+                          >Email address</label
+                        >
+                        <FormKit
+                          type="email"
+                          name="email"
+                          id="email"
+                          v-model="email"
+                          validation="required|email"
+                          input-class="px-5 py-3 placeholder-gray-500"
+                          inner-class="mt-0 h-[50px]"
+                          placeholder="Enter your email"
+                        />
+                      </div>
+                      <div class="mt-4 sm:mt-0 sm:ml-3">
+                        <button
+                          type="submit"
+                          :disabled="loading"
+                          class="disabled:opacity-75 disabled:cursor-not-allowed block w-full rounded-md border border-transparent px-5 py-3 bg-blue-600 text-base font-medium text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-offset-blue-900 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 px-10"
+                        >
+                          Notify me
+                        </button>
+                      </div>
+                    </div>
+                    <p class="mt-3 text-sm text-gray-300 sm:mt-4"></p>
+                  </FormKit>
+                </div>
+              </div>
+            </div>
+
+            <div class="sm:mx-auto sm:max-w-3xl sm:px-6">
+              <div
+                class="py-12 sm:relative sm:mt-12 sm:py-16 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2"
+              >
+                <div class="hidden sm:block">
+                  <div
+                    class="absolute inset-y-0 left-1/2 w-screen bg-gray-800/30 rounded-l-3xl lg:left-80 lg:right-0 lg:w-full"
+                  />
+                  <svg
+                    class="absolute top-8 right-1/2 -mr-3 lg:m-0 lg:left-0"
+                    width="404"
+                    height="392"
+                    fill="none"
+                    viewBox="0 0 404 392"
+                  >
+                    <defs>
+                      <pattern
+                        id="837c3e70-6c3a-44e6-8854-cc48c737b659"
+                        x="0"
+                        y="0"
+                        width="20"
+                        height="20"
+                        patternUnits="userSpaceOnUse"
+                      >
+                        <rect
+                          x="0"
+                          y="0"
+                          width="4"
+                          height="4"
+                          class="text-gray-800"
+                          fill="currentColor"
+                        />
+                      </pattern>
+                    </defs>
+                    <rect
+                      width="404"
+                      height="392"
+                      fill="url(#837c3e70-6c3a-44e6-8854-cc48c737b659)"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="relative pl-4 -mr-40 sm:mx-auto sm:max-w-3xl sm:px-0 lg:max-w-none lg:h-full lg:pl-12"
+                >
+                  <img
+                    class="w-full rounded-md shadow-xl ring-1 ring-black ring-opacity-5 lg:h-full lg:w-auto lg:max-w-none"
+                    :src="LandingPageCreateScreenshot"
+                    alt="nodeops create screenshot"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Section Start -->
         <div
-          class="pt-10 bg-gray-900 sm:pt-16 lg:pt-8 pb-24 lg:pb-14 lg:overflow-hidden"
+          class="pt-10 bg-gray-900 sm:pt-16 lg:pt-8 pb-24 lg:pb-14 lg:overflow-hidden hidden"
         >
           <div class="mx-auto max-w-7xl lg:px-8">
             <div class="lg:grid lg:grid-cols-2 lg:gap-8">
@@ -153,6 +306,7 @@ const footerNavigation = {
             </div>
           </div>
         </div>
+        <!-- Hero Section End -->
 
         <!-- Feature section with screenshot -->
         <div class="relative bg-gray-50 pt-16 sm:pt-24 lg:pt-32">
