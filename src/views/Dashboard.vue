@@ -8,12 +8,8 @@ import { useApi } from "@/composables/api";
 import JobListItem from "@/components/JobListItem.vue";
 import BarChart from "@/components/charts/BarChart.vue";
 import { ref } from "vue";
-import { useMath } from "@/composables/math";
-import { useDayjs } from "@/composables/dayjs";
 import EmptyState from "@/components/EmptyState.vue";
 import { useRouter } from "vue-router";
-
-const { getDaysFromPast } = useDayjs();
 
 const stats = [
   {
@@ -49,7 +45,6 @@ const stats = [
 ];
 
 const chartContainer = ref(); // chart dom ref, for applying dynamic width
-const { randomIntArray } = useMath(); // generates dummy data for the chart
 
 const { get, loading, data: jobs, error } = useApi<Array<any>>("api/jobs");
 get();
@@ -73,15 +68,14 @@ const onCreateJob = () => {
       />
 
       <!-- Bar Chart -->
-
       <div
         class="col-span-3 mt-4 bg-white shadow rounded-lg p-1"
         ref="chartContainer"
       >
         <BarChart
           v-if="chartContainer"
-          :x="getDaysFromPast(7)"
-          :y="randomIntArray(0, 0, 7)"
+          :x="[]"
+          :y="[]"
           :height="320"
           :width="chartContainer.clientWidth"
         />

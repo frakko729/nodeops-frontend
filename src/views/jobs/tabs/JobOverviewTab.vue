@@ -3,14 +3,9 @@ import { CheckIcon, UsersIcon } from "@heroicons/vue/outline";
 import ChainlinkLogo from "@/assets/svgs/chainlink-logo.svg";
 import BarChart from "@/components/charts/BarChart.vue";
 import { computed, ref } from "vue";
-import { useMath } from "@/composables/math";
 import Clipboard from "@/components/Clipboard.vue";
 import StatCard from "@/components/StatCard.vue";
-import { useDayjs } from "@/composables/dayjs";
 import { useApi } from "@/composables/api";
-
-const { getDaysFromPast } = useDayjs();
-const days = getDaysFromPast();
 
 interface Props {
   job: any;
@@ -75,7 +70,6 @@ const stats = [
 ];
 
 const chartContainer = ref(); // chart dom ref, for applying dynamic width
-const { randomIntArray } = useMath(); // generates dummy data for the chart
 </script>
 
 <template>
