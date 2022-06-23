@@ -22,8 +22,9 @@ const generalStore = useGeneralStore();
               <div class="sm:flex sm:space-x-5 space-y-4 sm:space-y-0">
                 <div class="flex-shrink-0">
                   <img
+                    v-for="chain in node.chains"
                     class="mx-auto h-16 w-16 rounded-full"
-                    :src="generalStore.getImage(node.chain.image)"
+                    :src="generalStore.getImage(chain.image)"
                   />
                 </div>
                 <div class="h-max self-center">
@@ -37,9 +38,10 @@ const generalStore = useGeneralStore();
                     class="flex space-x-2 items-center mt-2 w-max mx-auto sm:ml-0"
                   >
                     <span
+                      v-for="chain in node.chains"
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                     >
-                      <span v-if="node.chain.is_mainnet">Mainnet</span>
+                      <span v-if="chain.is_mainnet">Mainnet</span>
                       <span v-else>Testnet</span>
                     </span>
 

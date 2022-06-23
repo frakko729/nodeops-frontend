@@ -113,7 +113,7 @@ const onNotifyMe = async () => {
             <div>
               <button
                 @click="userStore.login()"
-                class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-offset-blue-900 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                class="w-full flex items-center justify-center px-3 sm:px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-offset-blue-900 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 Early access
               </button>

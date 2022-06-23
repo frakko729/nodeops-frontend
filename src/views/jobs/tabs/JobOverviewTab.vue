@@ -2,11 +2,12 @@
 import { CheckIcon, UsersIcon } from "@heroicons/vue/outline";
 import ChainlinkLogo from "@/assets/svgs/chainlink-logo.svg";
 import BarChart from "@/components/charts/BarChart.vue";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useMath } from "@/composables/math";
 import Clipboard from "@/components/Clipboard.vue";
 import StatCard from "@/components/StatCard.vue";
 import { useDayjs } from "@/composables/dayjs";
+import { useApi } from "@/composables/api";
 
 const { getDaysFromPast } = useDayjs();
 const days = getDaysFromPast();
@@ -16,14 +17,38 @@ interface Props {
 }
 const { job } = defineProps<Props>();
 
+const {
+  get: getTotal,
+  loading: totalLoading,
+  data: totalData,
+  error: totalError,
+} = useApi<any>(`api/metrics/jobs/${job.id}/total`);
+getTotal();
+
+const {
+  get: getTimeline,
+  loading: timelineLoading,
+  data: timelineData,
+  error: timelineError,
+} = useApi<Array<any>>(`api/metrics/jobs/${job.id}/timeline`);
+
+getTimeline();
+
+const timelineXAxis = computed(
+  (): Array<any> => timelineData.value?.map((item: any) => item.date) || []
+);
+
+const timelineYAxis = computed(
+  (): Array<any> => timelineData.value?.map((item: any) => item.count) || []
+);
+
 const stats = [
   {
     id: 1,
     name: "Total Requests",
-    stat: "N/A",
+    stat: totalData,
     icon: UsersIcon,
     changeType: "",
-    change: "",
     // change: "122",
     // changeType: "increase",
   },
@@ -114,9 +139,9 @@ const { randomIntArray } = useMath(); // generates dummy data for the chart
     </div>
     <div class="mt-8 bg-white shadow rounded-lg p-1" ref="chartContainer">
       <BarChart
-        v-if="chartContainer"
-        :x="days"
-        :y="randomIntArray(100, 1000, 30)"
+        v-if="chartContainer && timelineData"
+        :x="timelineXAxis"
+        :y="timelineYAxis"
         :width="chartContainer.clientWidth"
       />
     </div>
