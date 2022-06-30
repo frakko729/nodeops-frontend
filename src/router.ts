@@ -37,7 +37,30 @@ const routes: Array<RouteRecordRaw> = [
     path: "/jobs/create",
     name: "job-create",
     component: () =>
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobCreate.vue"),
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
+  },
+  {
+    path: "/jobs/create/ui",
+    name: "job-create-ui",
+    component: () =>
       import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobForm.vue"),
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
+  },
+  {
+    path: "/jobs/create/custom-code",
+    name: "job-create-custom-code",
+    component: () =>
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobCustomCode.vue"),
+    meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
+  },
+  {
+    path: "/jobs/create/existing-bridge",
+    name: "job-create-existing-bridge",
+    component: () =>
+      import(
+        /* webpackChunkName: "jobs" */ "@/views/jobs/JobExistingBridge.vue"
+      ),
     meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {
@@ -51,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/jobs/:jobId/edit",
     name: "job-edit",
     component: () =>
-      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobForm.vue"),
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobCreate.vue"),
     meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {

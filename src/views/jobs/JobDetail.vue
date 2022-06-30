@@ -13,6 +13,7 @@ import JobOverviewTab from "./tabs/JobOverviewTab.vue";
 import { useTabs } from "@/composables/tabs";
 import JobErrorsTab from "./tabs/JobErrorsTab.vue";
 import JobRunsTab from "./tabs/JobRunsTab.vue";
+import Badge from "@/components/Badge.vue";
 
 const {
   get,
@@ -112,37 +113,12 @@ const onDeleteConfirm = async () => {
               <div
                 class="flex space-x-2 items-center mt-2 w-max mx-auto sm:ml-0"
               >
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                >
-                  <svg
-                    :class="{
-                      'text-green-400 ': job.status === 1,
-                      'text-yellow-400 ': job.status === 0,
-                      'text-red-400 ': job.status === -1,
-                    }"
-                    class="-ml-0.5 mr-1.5 h-2 w-2"
-                    fill="currentColor"
-                    viewBox="0 0 8 8"
-                  >
-                    <circle cx="4" cy="4" r="3" />
-                  </svg>
-                  <span v-if="job.status === 1">Running</span>
-                  <span v-if="job.status === 0">Stopped</span>
-                  <span v-if="job.status === -1">Stopped</span>
-                </span>
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                >
-                  <span v-if="job.chain.is_mainnet">Mainnet</span>
-                  <span v-else>Testnet</span>
-                </span>
-
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
-                >
-                  n/a
-                </span>
+                <Badge
+                  :text="job.status === 1 ? 'Running' : 'Stopped'"
+                  :statusColor="job.status === 1 ? 'green' : 'yellow'"
+                />
+                <Badge :text="job.chain.is_mainnet ? 'Mainnet' : 'Testnet'" />
+                <Badge :text="job.chain.region || 'n/a'" />
               </div>
             </div>
           </div>

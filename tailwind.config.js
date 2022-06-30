@@ -8,6 +8,12 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
     "./src/formkit.classes.ts",
   ],
+  safelist: [
+    {
+      pattern: /bg-(red|green|blue|gray|yellow)-(100)/,
+      pattern: /text-(red|green|blue|gray|yellow)-(400|500|600|800)/,
+    },
+  ],
   theme: {
     colors: {
       transparent: "transparent",

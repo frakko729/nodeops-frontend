@@ -3,6 +3,7 @@ import { ChevronRightIcon, LinkIcon } from "@heroicons/vue/solid";
 import SimpleBarChart from "@/components/charts/SimpleBarChart.vue";
 import { useGeneralStore } from "@/stores/generalStore";
 import { useMath } from "@/composables/math";
+import Badge from "./Badge.vue";
 
 interface Props {
   job: any;
@@ -69,12 +70,12 @@ const z = randomIntArray(1, 1, 14);
               :src="generalStore.getImage(job.chain.image)"
               class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
             />
-            <div
-              class="hidden sm:inline-flex self-center h-max bg-blue-100 text-blue-800 w-max items-center px-2 py-0 rounded-full text-xs font-medium"
-            >
-              <span v-if="job.chain.is_mainnet">Mainnet</span>
-              <span v-else>Testnet</span>
-            </div>
+
+            <Badge
+              class="hidden sm:inline-flex self-center h-max"
+              :text="job.chain.is_mainnet ? 'Mainnet' : 'Testnet'"
+              color="blue"
+            />
           </div>
           <div
             class="md:w-5/12 lg:w-2/6 hidden md:flex md:h-max md:self-center md:justify-end"

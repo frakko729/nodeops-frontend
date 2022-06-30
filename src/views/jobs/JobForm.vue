@@ -2,8 +2,8 @@
 import { computed, reactive, ref, watch, watchEffect } from "vue";
 import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
 import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
-import Container from "@/components/Container.vue";
 import Tabs from "../../components/Tabs.vue";
+import Container from "../../components/Container.vue";
 import KeyValueTable from "../../components/tables/KeyValueTable.vue";
 import JsonOutput from "../../components/JsonOutput.vue";
 import { useApi } from "@/composables/api";

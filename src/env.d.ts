@@ -21,3 +21,5 @@ declare module "vue-blockies";
 declare module "js-cookie";
 declare module "prismjs";
 declare module "prism-es6";
+declare module "tailwind.config.js";
+declare module "tailwindcss/resolveConfig";
