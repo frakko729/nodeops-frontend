@@ -5,6 +5,7 @@ import Container from "@/components/Container.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
 import Badge from "@/components/Badge.vue";
 import Breadcrumb from "@/components/Breadcrumb.vue";
+import Steps from "@/components/Steps.vue";
 
 interface Action {
   title: string;
@@ -51,11 +52,10 @@ const breadcrumb = reactive([
 
 <template>
   <Container>
-    <Breadcrumb :items="breadcrumb" class="mb-4" />
-
     <SectionHeader title="Create new Job" />
+
     <div
-      class="flex flex-col md:flex-row mx-auto w-full space-y-6 md:space-y-0 md:space-x-4 lg:space-x-8 xl:space-y-0 mt-6"
+      class="flex flex-col md:flex-row mx-auto w-full space-y-6 md:space-y-0 md:space-x-4 lg:space-x-8 xl:space-y-0 mt-8"
     >
       <router-link
         v-for="action in actions"
@@ -72,7 +72,7 @@ const breadcrumb = reactive([
         >
           <component
             :is="action.icon"
-            class="w-10 h-10 text-blue-600"
+            class="w-10 h-10 text-blue-500 group-hover:text-blue-600 transition-colors"
           ></component>
         </div>
         <div>

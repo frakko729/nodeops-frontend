@@ -4,7 +4,14 @@ import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
 import { ref, watch } from "vue";
 
-const code = ref(`console.log('Hello, world!')`);
+interface Props {
+  modelValue: string;
+  disabled?: boolean;
+  height?: string;
+}
+const { modelValue, disabled = false, height = "680" } = defineProps<Props>();
+const emit = defineEmits(["update:modelValue"]);
+
 const extensions = [javascript(), oneDark];
 
 const log = (text: any, $event: any) => console.log({ text, $event });
@@ -13,9 +20,10 @@ const log = (text: any, $event: any) => console.log({ text, $event });
 <template>
   <div>
     <codemirror
-      v-model="code"
+      :disabled="disabled"
+      v-model="modelValue"
       placeholder="Code goes here..."
-      :style="{ height: '400px' }"
+      :style="{ height: `${height}px`, borderRadius: '25px' }"
       :autofocus="true"
       :indent-with-tab="true"
       :tab-size="2"
