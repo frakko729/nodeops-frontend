@@ -27,6 +27,7 @@ const actions: Action[] = [
     description: "Write custom javascript code for your bridge.",
     icon: markRaw(CodeIcon),
     route: { name: "job-create-custom-code" },
+    isDisabled: true,
   },
   {
     title: "Create with existing bridge",
@@ -60,7 +61,7 @@ const breadcrumb = reactive([
       <router-link
         v-for="action in actions"
         :disabled="action.isDisabled"
-        :to="action.route"
+        :to="!action.isDisabled ? action.route : {}"
         :class="{
           'hover:shadow-md': !action.isDisabled,
           'cursor-not-allowed': action.isDisabled,

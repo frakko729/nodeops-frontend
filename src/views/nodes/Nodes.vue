@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import Container from "@/components/Container.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
-import { useApi } from "@/composables/api";
 import { useGeneralStore } from "@/stores/generalStore";
-
-const { get, loading, data, error } = useApi<any>("api/node"); // abstraction of axios with composition api
-get(); // executes the get request, don't wait for the promise, use data and loading for check
+import { useNodeStore } from "@/stores/nodeStore";
+import { onMounted } from "vue";
 
 const generalStore = useGeneralStore();
+const nodeStore = useNodeStore();
+
+onMounted(() => {
+  nodeStore.loadNodes();
+});
 </script>
 
 <template>
   <Container>
     <SectionHeader title="Nodes"></SectionHeader>
 
-    <div v-if="data && !loading" class="mt-5 flex flex-col space-y-6">
-      <div v-for="node in data" :key="node.id" class="flex flex-col">
+    <div v-if="nodeStore.nodes" class="mt-5 flex flex-col space-y-6">
+      <div v-for="node in nodeStore.nodes" :key="node.id" class="flex flex-col">
         <div class="rounded-lg bg-white overflow-hidden shadow">
           <div class="bg-white p-6">
             <div class="sm:flex sm:items-center sm:justify-between">

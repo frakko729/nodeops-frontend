@@ -9,7 +9,7 @@ import {
 } from "@headlessui/vue";
 import { BeakerIcon } from "@heroicons/vue/outline";
 import { FormKitSchema } from "@formkit/vue";
-import Listbox from "../Listbox.vue";
+import Listbox from "../inputs/Listbox.vue";
 
 /**
  * Tasks boilerplate

@@ -8,6 +8,7 @@ import {
 import { CheckCircleIcon } from "@heroicons/vue/solid";
 import { useChainStore } from "@/stores/chainStore";
 import { useGeneralStore } from "@/stores/generalStore";
+import { onMounted } from "vue";
 
 interface Props {
   modelValue: Backend.Models.Chain;
@@ -18,7 +19,10 @@ const emit = defineEmits(["update:modelValue"]);
 
 const generalStore = useGeneralStore();
 const chainStore = useChainStore();
-chainStore.loadChains();
+
+onMounted(() => {
+  chainStore.loadChains();
+});
 </script>
 
 <template>

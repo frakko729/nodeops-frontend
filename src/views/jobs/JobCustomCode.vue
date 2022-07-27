@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, watch } from "vue";
 import Container from "@/components/Container.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
 import { TerminalIcon, PencilIcon } from "@heroicons/vue/outline";
@@ -8,14 +8,19 @@ import { useApi } from "@/composables/api";
 import { useSteps } from "@/composables/steps";
 import { useNotification } from "@/composables/notification";
 import simpleRequestJs from "@/assets/examples/simpleRequest.js?raw";
-import ChainRadioGroup from "@/components/ChainRadioGroup.vue";
+import ChainRadioGroup from "@/components/inputs/ChainRadioGroup.vue";
 import Steps from "@/components/Steps.vue";
-import Listbox from "@/components/Listbox.vue";
+import Listbox from "@/components/inputs/Listbox.vue";
 import { useForm } from "@/composables/form";
 import { useJobTypeStore } from "@/stores/jobTypeStore";
 import { useRouter } from "vue-router";
 import { useGeneralStore } from "@/stores/generalStore";
 import Badge from "@/components/Badge.vue";
+import NodeRadioGroup from "@/components/inputs/NodeRadioGroup.vue";
+import NodeFilter from "@/components/filters/NodeFilter.vue";
+import { useFilter } from "@/composables/filter";
+import { TrashIcon } from "@heroicons/vue/solid";
+import EmptyState from "@/components/EmptyState.vue";
 
 const generalStore = useGeneralStore();
 const jobTypeStore = useJobTypeStore(); // Get all job types
@@ -47,6 +52,16 @@ const { steps, nextStep, prevStep, onStep, currentStepIndex } = useSteps([
  * Submiting to backend
  */
 const { loading, data, error, post } = useApi("api/jobs/code");
+
+/**
+ * Reactive Filter with helpers
+ */
+const { reactiveFilter, parmFilter, isFilterd, resetFilter } =
+  useFilter<Backend.Filters.NodeFilter>({
+    sort: "id",
+    chains: [],
+    regions: [],
+  });
 
 const onDeploy = async () => {
   await post({ code: jobData.name });
@@ -95,7 +110,20 @@ const onDeploy = async () => {
         </div>
       </FormKit>
 
-      <ChainRadioGroup class="mt-8" v-model="jobData.chain" />
+      <NodeRadioGroup class="mt-4" v-model="jobData.chain" :filter="parmFilter">
+        <template v-slot:header>
+          <NodeFilter v-model="reactiveFilter"
+        /></template>
+
+        <template v-slot:empty>
+          <EmptyState
+            @click="resetFilter()"
+            :icon="TrashIcon"
+            v-if="isFilterd"
+            text="Your filter does not match any records."
+          />
+        </template>
+      </NodeRadioGroup>
     </template>
     <!-- Job Detail Step End -->
 

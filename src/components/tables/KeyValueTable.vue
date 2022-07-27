@@ -1,7 +1,7 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <script setup lang="ts">
 import TableActions from "./TableActions.vue";
-import Toggle from "../Toggle.vue";
+import Toggle from "../inputs/Toggle.vue";
 
 interface KeyValue {
   id: number;

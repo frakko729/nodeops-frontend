@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useChainStore } from "@/stores/chainStore";
 import {
   Dialog,
   DialogOverlay,
@@ -18,11 +19,14 @@ import {
 } from "@headlessui/vue";
 import { XIcon } from "@heroicons/vue/outline";
 import { ChevronDownIcon } from "@heroicons/vue/solid";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 interface Props {
   show?: boolean;
+  modelValue: any;
 }
+
+const emit = defineEmits(["update:modelValue"]);
 
 const { show = false } = defineProps<Props>();
 
@@ -31,16 +35,28 @@ const sortOptions = [
   { name: "Chain", href: "#", current: false },
   { name: "Status", href: "#", current: true },
 ];
-const filters = [
+
+/**
+ * Chain Options
+ */
+const chainOptions = ref<any>([]);
+
+const chainStore = useChainStore();
+chainStore.loadChains().then(() => {
+  chainOptions.value = chainStore.chains.map((chain: Backend.Models.Chain) => {
+    return {
+      label: chain.name,
+      value: chain.id,
+      checked: false,
+    };
+  });
+});
+
+const filters = reactive([
   {
     id: "chains",
     name: "Chains",
-    options: [
-      { value: "eth", label: "Ethereum", checked: false },
-      { value: "bnb", label: "Binance Smart Chain", checked: false },
-      { value: "polygon", label: "Polygon", checked: false },
-      { value: "axax", label: "Avalanche", checked: false },
-    ],
+    options: chainOptions,
   },
   {
     id: "status",
@@ -51,7 +67,14 @@ const filters = [
       { value: "error", label: "Error", checked: false },
     ],
   },
-];
+]);
+
+const onChange = (id: string, event: any, test: any) => {
+  console.log(id);
+  console.log(event);
+  console.log(test);
+};
+
 const open = ref(false);
 </script>
 <template>
@@ -170,11 +193,18 @@ const open = ref(false);
                               class="flex items-center"
                             >
                               <input
+                                type="checkbox"
                                 :id="`filter-${section.id}-${optionIdx}`"
                                 :name="`${section.id}[]`"
                                 :value="option.value"
-                                type="checkbox"
                                 :checked="option.checked"
+                                @change="
+                                  onChange(
+                                    section.id,
+                                    option.value,
+                                    option.checked
+                                  )
+                                "
                                 class="h-4 w-4 border-gray-300 rounded text-blue-600 focus:ring-blue-500"
                               />
                               <label
