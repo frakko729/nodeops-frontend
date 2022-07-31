@@ -14,48 +14,65 @@ import { useTabs } from "@/composables/tabs";
 import JobErrorsTab from "./tabs/JobErrorsTab.vue";
 import JobRunsTab from "./tabs/JobRunsTab.vue";
 import Badge from "@/components/Badge.vue";
-
-const {
-  get,
-  loading,
-  data: job,
-  overrideEndpoint,
-  error,
-} = useApi<any>("api/jobs/");
+import { Job } from "@/interfaces/backend/models/Job";
 
 const route = useRoute();
+const router = useRouter();
+const generalStore = useGeneralStore();
 const jobId = ref();
+const endpoint = ref();
 
+const { get, data: job } = useApi<Job>(endpoint);
+
+/**
+ * Watch for route changes and get data for the corosponding id
+ */
 watchEffect(() => {
   if (route.params) {
     jobId.value = route.params.jobId;
     if (jobId.value) {
-      overrideEndpoint("api/jobs/" + jobId.value);
+      endpoint.value = `api/jobs/${jobId.value}`;
       get();
     }
   }
 });
 
+/**
+ * Filterd error runs
+ */
 const errors = computed((): Array<any> => {
-  if (job.value?.node_job?.runs) {
-    const runs: Array<any> = job.value.node_job.runs;
+  if (job.value?.nodeJob?.runs) {
+    const runs: Array<any> = job.value.nodeJob.runs;
     return runs.filter((run: any) => run.status === 0);
   } else {
     return [];
   }
 });
 
+/**
+ * Filterd success runs
+ */
 const runs = computed((): Array<any> => {
-  if (job.value?.node_job?.runs) {
-    return job.value.node_job.runs;
+  if (job.value?.nodeJob?.runs) {
+    return job.value.nodeJob.runs;
   } else {
     return [];
   }
 });
 
+/**
+ * Count errors from filterd list
+ */
 const errorsCount = computed((): number => errors.value.length);
+
+/**
+ * Count success from filterd list
+ */
 const runsCount = computed((): number => runs.value.length);
 
+/**
+ * Reactive tabs
+ */
 const { tabs, activeTab } = useTabs([
   { name: "Overview", current: true },
   { name: "Definition", current: false },
@@ -63,8 +80,9 @@ const { tabs, activeTab } = useTabs([
   { name: "Runs", current: false, count: runsCount },
 ]);
 
-const generalStore = useGeneralStore();
-const router = useRouter();
+/**
+ * Delete Modal state
+ */
 const isDeleteModalOpen = ref(false);
 
 /**
@@ -79,7 +97,7 @@ const onDeleteButton = () => {
  */
 const onDeleteConfirm = async () => {
   isDeleteModalOpen.value = false;
-  const { del, data, error } = useApi<any>("api/jobs/" + job.value.id);
+  const { del, data, error } = useApi<any>("api/jobs/" + job.value?.id);
   await del();
 
   if (data.value && !error.value) {
@@ -91,7 +109,7 @@ const onDeleteConfirm = async () => {
 </script>
 
 <template>
-  <Container v-if="job">
+  <Container v-if="job && job.deployments">
     <div class="rounded-lg bg-white overflow-hidden shadow">
       <h2 class="sr-only" id="job-overview-title">Job Details</h2>
       <div class="bg-white p-6">
@@ -99,8 +117,9 @@ const onDeleteConfirm = async () => {
           <div class="sm:flex sm:space-x-5 space-y-4 sm:space-y-0">
             <div class="flex-shrink-0">
               <img
+                v-if="job.deployments[0].chain"
                 class="mx-auto h-16 w-16 rounded-full"
-                :src="generalStore.getImage(job.chain.image)"
+                :src="generalStore.getImage(job.deployments[0].chain.image)"
               />
             </div>
             <div class="h-max self-center">
@@ -114,11 +133,19 @@ const onDeleteConfirm = async () => {
                 class="flex space-x-2 items-center mt-2 w-max mx-auto sm:ml-0"
               >
                 <Badge
-                  :text="job.status === 1 ? 'Running' : 'Stopped'"
-                  :statusColor="job.status === 1 ? 'green' : 'yellow'"
+                  :text="
+                    job.deployments[0].status === 1 ? 'Running' : 'Stopped'
+                  "
+                  :statusColor="
+                    job.deployments[0].status === 1 ? 'green' : 'yellow'
+                  "
                 />
-                <Badge :text="job.chain.is_mainnet ? 'Mainnet' : 'Testnet'" />
-                <Badge :text="job.chain.region || 'n/a'" />
+                <Badge
+                  :text="
+                    job.deployments[0].chain?.isMainnet ? 'Mainnet' : 'Testnet'
+                  "
+                />
+                <Badge :text="job.deployments[0].node?.region?.name || 'n/a'" />
               </div>
             </div>
           </div>
@@ -155,7 +182,7 @@ const onDeleteConfirm = async () => {
       <JobOverviewTab v-if="activeTab?.name === 'Overview'" :job="job" />
 
       <template v-if="activeTab?.name === 'Definition'">
-        <TomlEditor class="mt-4" :input="job.toml"
+        <TomlEditor class="mt-4" :input="job.deployments[0].toml"
       /></template>
 
       <JobErrorsTab

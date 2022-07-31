@@ -21,6 +21,8 @@ import NodeFilter from "@/components/filters/NodeFilter.vue";
 import { useFilter } from "@/composables/filter";
 import { TrashIcon } from "@heroicons/vue/solid";
 import EmptyState from "@/components/EmptyState.vue";
+import { Node } from "@/interfaces/backend/models/Node";
+import { NodeFilter as NodeFilterI } from "@/interfaces/backend/filters/NodeFilter";
 
 const generalStore = useGeneralStore();
 const jobTypeStore = useJobTypeStore(); // Get all job types
@@ -33,7 +35,7 @@ const router = useRouter();
  */
 const jobData = reactive({
   name: "",
-  chain: {} as Backend.Models.Chain,
+  node: {} as Node,
   code: simpleRequestJs,
   jobType: jobTypeStore.jobTypes[0],
   agree: false,
@@ -57,7 +59,7 @@ const { loading, data, error, post } = useApi("api/jobs/code");
  * Reactive Filter with helpers
  */
 const { reactiveFilter, parmFilter, isFilterd, resetFilter } =
-  useFilter<Backend.Filters.NodeFilter>({
+  useFilter<NodeFilterI>({
     sort: "id",
     chains: [],
     regions: [],
@@ -110,7 +112,7 @@ const onDeploy = async () => {
         </div>
       </FormKit>
 
-      <NodeRadioGroup class="mt-4" v-model="jobData.chain" :filter="parmFilter">
+      <NodeRadioGroup class="mt-4" v-model="jobData.node" :filter="parmFilter">
         <template v-slot:header>
           <NodeFilter v-model="reactiveFilter"
         /></template>
@@ -146,8 +148,9 @@ const onDeploy = async () => {
             <div class="sm:flex sm:space-x-5 space-y-4 sm:space-y-0">
               <div class="flex-shrink-0">
                 <img
+                  v-if="jobData.node?.chains?.[0]"
                   class="mx-auto h-16 w-16 rounded-full"
-                  :src="generalStore.getImage(jobData.chain.image)"
+                  :src="generalStore.getImage(jobData.node.chains[0].image)"
                 />
               </div>
               <div class="h-max self-start">
@@ -161,7 +164,10 @@ const onDeploy = async () => {
                   class="flex space-x-2 items-center mt-2 w-max mx-auto sm:ml-0"
                 >
                   <Badge
-                    :text="jobData.chain.is_mainnet ? 'Mainnet' : 'Testnet'"
+                    v-if="jobData.node?.chains?.[0]"
+                    :text="
+                      jobData.node.chains[0].isMainnet ? 'Mainnet' : 'Testnet'
+                    "
                   />
                   <Badge :text="jobData.jobType.name" />
                 </div>

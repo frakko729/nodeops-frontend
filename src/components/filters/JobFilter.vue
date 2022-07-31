@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { JobFilter } from "@/interfaces/backend/filters/JobFilter";
+import { Chain } from "@/interfaces/backend/models/Chain";
 import { useChainStore } from "@/stores/chainStore";
 import { ref } from "vue";
 import DropdownCheckboxFilter from "./inputs/DropdownCheckboxFilter.vue";
 import DropdownSelectFilter from "./inputs/DropdownSelectFilter.vue";
 
 interface Props {
-  modelValue: Backend.Filters.JobFilter;
+  modelValue: JobFilter;
 }
 
 const { modelValue } = defineProps<Props>();
@@ -26,7 +28,7 @@ const chainOptions = ref<any>([]);
 
 const chainStore = useChainStore();
 chainStore.loadChains().then(() => {
-  chainOptions.value = chainStore.chains.map((chain: Backend.Models.Chain) => {
+  chainOptions.value = chainStore.chains.map((chain: Chain) => {
     return {
       label: chain.name,
       value: chain.id,

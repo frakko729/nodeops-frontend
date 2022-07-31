@@ -4,9 +4,10 @@ import SimpleBarChart from "@/components/charts/SimpleBarChart.vue";
 import { useGeneralStore } from "@/stores/generalStore";
 import { useMath } from "@/composables/math";
 import Badge from "./Badge.vue";
+import { Job } from "@/interfaces/backend/models/Job";
 
 interface Props {
-  job: any;
+  job: Job;
 }
 const { job } = defineProps<Props>();
 
@@ -35,16 +36,18 @@ const z = randomIntArray(1, 1, 14);
 </script>
 
 <template>
-  <li>
+  <li v-if="job.deployments">
     <router-link
       :to="{ name: 'job-detail', params: { jobId: job.id } }"
       class="h-full flex bg-white shadow hover:shadow-md overflow-hidden rounded-md group transition-all"
     >
       <div
         :class="{
-          'bg-green-400 group-hover:bg-green-500': job.status === 1,
-          'bg-yellow-400 group-hover:bg-yellow-500': job.status === 0,
-          'bg-red-400 group-hover:bg-red-500': job.status === -1,
+          'bg-green-400 group-hover:bg-green-500':
+            job.deployments[0].status === 1,
+          'bg-yellow-400 group-hover:bg-yellow-500':
+            job.deployments[0].status === 0,
+          'bg-red-400 group-hover:bg-red-500': job.deployments[0].status === -1,
         }"
         class="w-2 sm:w-4 h-20 transition-colors rounded-l-md"
       ></div>
@@ -67,13 +70,16 @@ const z = randomIntArray(1, 1, 14);
           </div>
           <div class="flex space-x-4 w-2/6 md:w-12">
             <img
-              :src="generalStore.getImage(job.chain.image)"
+              v-if="job.deployments[0].chain"
+              :src="generalStore.getImage(job.deployments[0].chain.image)"
               class="h-12 w-12 rounded-full opacity-80 group-hover:opacity-100 transition"
             />
 
             <Badge
               class="hidden sm:inline-flex self-center h-max"
-              :text="job.chain.is_mainnet ? 'Mainnet' : 'Testnet'"
+              :text="
+                job.deployments[0].chain?.isMainnet ? 'Mainnet' : 'Testnet'
+              "
               color="blue"
             />
           </div>

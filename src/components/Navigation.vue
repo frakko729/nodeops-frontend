@@ -102,8 +102,11 @@ watch(
               v-for="item in navigation"
               :key="item.name"
               :to="{ name: item.to }"
-              :class="{ 'border-blue-500 text-gray-900': item.current }"
-              class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              :class="{
+                'border-blue-500 text-gray-900': item.current,
+                'border-transparent': !item.current,
+              }"
+              class="text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
             >
               {{ item.name }}
             </router-link>

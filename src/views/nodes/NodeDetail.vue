@@ -4,15 +4,18 @@ import { useRoute, useRouter } from "vue-router";
 import Container from "@/components/Container.vue";
 import SectionHeader from "@/components/SectionHeader.vue";
 import { useApi } from "@/composables/api";
+import { Node } from "@/interfaces/backend/models/Node";
+
+// Url ref for backend request
+const url = ref("");
 
 // Used at this scope level and not inside watchEffect for all variables be available inside the template
 const {
   get, // function for executing the get request
   loading, // bool loading indicator
   data: node, // response data, renaming data var to node
-  overrideEndpoint, // function for overriding the endpoint
   error, // holds all errors after execution
-} = useApi<any>("api/node/");
+} = useApi<Node>(url);
 
 const route = useRoute(); // route object for getting parms
 const nodeId = ref(); // ref for storing the node id
@@ -24,7 +27,7 @@ watchEffect(() => {
 
     // nodeId.value can be undefined because of side effects, so make sure it executes only if not
     if (nodeId.value) {
-      overrideEndpoint("api/node/" + nodeId.value); // override url for the changed id
+      url.value = `api/node/${nodeId.value}`; // override url for the changed id
       get(); // executes get request
     }
   }

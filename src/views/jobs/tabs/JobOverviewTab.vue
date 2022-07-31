@@ -6,26 +6,21 @@ import { computed, ref } from "vue";
 import Clipboard from "@/components/Clipboard.vue";
 import StatCard from "@/components/StatCard.vue";
 import { useApi } from "@/composables/api";
+import { Job } from "@/interfaces/backend/models/Job";
 
 interface Props {
-  job: any;
+  job: Job;
 }
 const { job } = defineProps<Props>();
 
-const {
-  get: getTotal,
-  loading: totalLoading,
-  data: totalData,
-  error: totalError,
-} = useApi<any>(`api/metrics/jobs/${job.id}/total`);
+const { get: getTotal, data: totalData } = useApi<any>(
+  `api/metrics/jobs/${job.id}/total`
+);
 getTotal();
 
-const {
-  get: getTimeline,
-  loading: timelineLoading,
-  data: timelineData,
-  error: timelineError,
-} = useApi<Array<any>>(`api/metrics/jobs/${job.id}/timeline`);
+const { get: getTimeline, data: timelineData } = useApi<Array<any>>(
+  `api/metrics/jobs/${job.id}/timeline`
+);
 
 getTimeline();
 
@@ -90,33 +85,36 @@ const chartContainer = ref(); // chart dom ref, for applying dynamic width
               {{ job.url }}
             </dd>
           </div>
-          <div class="sm:col-span-1 relative w-max">
+          <div
+            class="sm:col-span-1 relative w-max"
+            v-if="job.deployments && job.deployments[0].node"
+          >
             <dt class="text-sm font-medium text-gray-500">Oracle Id</dt>
             <dd class="mt-1 text-sm text-gray-900 flex">
-              <span v-if="job.node?.oracle_address">{{
-                job.node.oracle_address
+              <span v-if="job.deployments[0].node.oracleAddress">{{
+                job.deployments[0].node.oracleAddress
               }}</span>
               <span v-else>n/a</span>
             </dd>
             <Clipboard
-              v-if="job.node?.oracle_address"
+              v-if="job.deployments[0].node.oracleAddress"
               title="Oracle Id"
-              :source="job.node.oracle_address"
+              :source="job.deployments[0].node.oracleAddress"
               class="absolute -right-10 top-5"
             />
           </div>
-          <div class="sm:col-span-1 relative w-max">
+          <div class="sm:col-span-1 relative w-max" v-if="job.deployments">
             <dt class="text-sm font-medium text-gray-500">Job Id</dt>
             <dd class="mt-1 text-sm text-gray-900">
-              <span v-if="job.external_job_id">{{
-                job.external_job_id.replace(/-/g, "")
+              <span v-if="job.deployments[0].externalJobId">{{
+                job.deployments[0].externalJobId.replace(/-/g, "")
               }}</span>
               <span v-else>n/a</span>
             </dd>
             <Clipboard
               title="Job Id"
-              v-if="job.external_job_id"
-              :source="job.external_job_id.replace(/-/g, '')"
+              v-if="job.deployments[0].externalJobId"
+              :source="job.deployments[0].externalJobId.replace(/-/g, '')"
               class="absolute -right-10 top-5"
             />
           </div>

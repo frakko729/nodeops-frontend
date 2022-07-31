@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch, watchEffect } from "vue";
-import { PlusIcon, CloudIcon } from "@heroicons/vue/solid";
+import { PlusIcon, CloudIcon, TrashIcon } from "@heroicons/vue/solid";
 import { CloudIcon as CloudOutlineIcon } from "@heroicons/vue/outline";
 import Tabs from "../../components/Tabs.vue";
 import Container from "../../components/Container.vue";
@@ -9,13 +9,20 @@ import JsonOutput from "../../components/JsonOutput.vue";
 import { useApi } from "@/composables/api";
 import TaskModal from "../../components/modals/TaskModal.vue";
 import EmptyState from "@/components/EmptyState.vue";
-import ChainRadioGroup from "@/components/inputs/ChainRadioGroup.vue";
 import Listbox from "@/components/inputs/Listbox.vue";
 import { useNotification } from "@/composables/notification";
 import { useRoute, useRouter } from "vue-router";
 import { useTabs } from "@/composables/tabs";
 import { useUrl } from "@/composables/url";
 import Alert from "../../components/Alert.vue";
+import { useFilter } from "@/composables/filter";
+import NodeRadioGroup from "@/components/inputs/NodeRadioGroup.vue";
+import NodeFilter from "@/components/filters/NodeFilter.vue";
+import { Parameter } from "@/interfaces/Parameter";
+import { Job } from "@/interfaces/backend/models/Job";
+import { Node } from "@/interfaces/backend/models/Node";
+import { NodeFilter as NodeFilterI } from "@/interfaces/backend/filters/NodeFilter";
+import { useJobTypeStore } from "@/stores/jobTypeStore";
 
 /**
  * Static select data
@@ -24,58 +31,60 @@ const methods = [
   { id: 1, name: "GET" },
   { id: 2, name: "POST" },
 ];
-const jobTypes = [{ id: 1, name: "Direct Request" }];
 
-interface Parms {
-  id: number;
-  key: string;
-  value: string;
-  isActive: boolean;
-}
+const jobTypeStore = useJobTypeStore();
 
 /**
  * Reactive user input data
  */
 const jobData = reactive({
-  jobType: jobTypes[0],
+  jobType: jobTypeStore.jobTypes[0],
   name: "",
   url: "",
   method: methods[0],
-  chain: {} as Backend.Models.Chain,
-  dynamicParms: [] as Array<Parms>,
-  staticParms: [] as Array<Parms>,
-  tasks: [] as Array<Parms>,
-  headers: [] as Array<Parms>,
+  node: {} as Node,
+  dynamicParms: [] as Parameter[],
+  staticParms: [] as Parameter[],
+  tasks: [] as Parameter[],
+  headers: [] as Parameter[],
 });
 
+const url = ref<string>("");
 const route = useRoute();
 const jobId = ref();
-const {
-  get,
-  loading,
-  data: job,
-  overrideEndpoint,
-  error,
-} = useApi<any>("api/jobs/");
+const { get, data: job } = useApi<Job>(url);
 
-const getApiData = async () => {
-  get().then(() => {
-    jobData.name = job.value.name;
-    jobData.url = job.value.url;
-    jobData.chain = job.value.chain;
-    jobData.dynamicParms = JSON.parse(job.value.dynamic_parameters);
-    jobData.headers = JSON.parse(job.value.headers);
-    jobData.staticParms = JSON.parse(job.value.static_parameters);
-    jobData.tasks = JSON.parse(job.value.tasks);
-  });
-};
-
+/**
+ * Load data from backend if in edit mode
+ */
 watchEffect(() => {
   if (route.params) {
     jobId.value = route.params.jobId;
     if (jobId.value) {
-      overrideEndpoint("api/jobs/" + jobId.value);
-      getApiData();
+      url.value = `api/jobs/${jobId.value}`;
+
+      get().then(() => {
+        if (job.value) {
+          jobData.name = job.value.name;
+          jobData.url = job.value.url;
+
+          if (job.value?.deployments?.[0].node) {
+            jobData.node = job.value.deployments[0].node;
+          }
+          if (job.value.dynamicParameters) {
+            jobData.dynamicParms = job.value.dynamicParameters;
+          }
+          if (job.value.headers) {
+            jobData.headers = job.value.headers;
+          }
+          if (job.value.staticParameters) {
+            jobData.staticParms = job.value.staticParameters;
+          }
+          if (job.value.tasks) {
+            jobData.tasks = job.value.tasks;
+          }
+        }
+      });
     }
   }
 });
@@ -102,7 +111,7 @@ const testRequest = async () => {
     method: jobData.method.name,
     url: jobData.url,
     job_type_id: jobData.jobType.id,
-    chain_id: 1,
+    node_id: 1,
     static_parameters: JSON.stringify(jobData.staticParms),
     dynamic_parameters: JSON.stringify(jobData.dynamicParms),
     tasks: JSON.stringify(jobData.tasks),
@@ -159,6 +168,9 @@ const addKeyValuePair = (appendTo: Array<any>, key?: any, value?: any) => {
   });
 };
 
+/**
+ * Detect if url has query parms and emit them to static parms
+ */
 const { getJsonFromUrl } = useUrl();
 
 watch(
@@ -191,15 +203,17 @@ const validateForm = () => {
  */
 const router = useRouter();
 const onSubmit = async () => {
-  const { post, put, data, loading, error, overrideEndpoint } =
-    useApi<any>("api/jobs");
+  const url = ref("api/jobs");
+
+  const { post, put, data, loading, error } = useApi<any>(url);
 
   const payload = {
     name: jobData.name,
     method: jobData.method.name,
     url: jobData.url,
     job_type_id: jobData.jobType.id,
-    chain_id: jobData.chain.id,
+    node_id: jobData.node.id,
+    chain_id: jobData.node?.chains?.[0].id,
     static_parameters: JSON.stringify(jobData.staticParms),
     dynamic_parameters: JSON.stringify(jobData.dynamicParms),
     tasks: JSON.stringify(jobData.tasks),
@@ -218,7 +232,7 @@ const onSubmit = async () => {
     }
   } else {
     try {
-      overrideEndpoint("api/jobs/" + jobId.value);
+      url.value = `api/jobs/${jobId.value}`;
       await put(payload);
     } catch (err) {}
 
@@ -268,6 +282,16 @@ const onTaskEdit = (task: any) => {
   isTaskModalOpen.value = true;
   taskToEdit.value = task;
 };
+
+/**
+ * Reactive Filter with helpers
+ */
+const { reactiveFilter, parmFilter, isFilterd, resetFilter } =
+  useFilter<NodeFilterI>({
+    sort: "id",
+    chains: [],
+    regions: [],
+  });
 </script>
 
 <template>
@@ -291,7 +315,7 @@ const onTaskEdit = (task: any) => {
         <!-- Chainlink Job Type Input Start -->
         <Listbox
           v-model="jobData.jobType"
-          :list="jobTypes"
+          :list="jobTypeStore.jobTypes"
           class="w-1/2 h-12"
         />
         <!-- Chainlink Job Type Input End -->
@@ -474,9 +498,20 @@ const onTaskEdit = (task: any) => {
     </Tabs>
     <!-- Tabs End -->
 
-    <!-- Chain Input Start -->
-    <ChainRadioGroup class="mt-8" v-model="jobData.chain" />
-    <!-- Chain Input End -->
+    <NodeRadioGroup class="mt-8" v-model="jobData.node" :filter="parmFilter">
+      <template v-slot:header>
+        <NodeFilter v-model="reactiveFilter"
+      /></template>
+
+      <template v-slot:empty>
+        <EmptyState
+          @click="resetFilter()"
+          :icon="TrashIcon"
+          v-if="isFilterd"
+          text="Your filter does not match any records."
+        />
+      </template>
+    </NodeRadioGroup>
 
     <div class="w-full mt-8">
       <button

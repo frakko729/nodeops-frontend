@@ -1,7 +1,7 @@
 import { Tab } from "@/interfaces/Tab";
 import { ref, computed } from "vue";
 
-export const useTabs = (input: Array<Tab>) => {
+export const useTabs = (input: Tab[]) => {
   const tabs = ref(input);
 
   const activeTab = computed((): Tab | undefined => {

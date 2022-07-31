@@ -6,6 +6,7 @@ import { useApi } from "@/composables/api";
 import { JsonRpcSigner, Web3Provider } from "@ethersproject/providers";
 import { Router } from "vue-router";
 import Cookies from "js-cookie";
+import { User } from "@/interfaces/backend/models/User";
 
 const signLoginMessage = "Login to LinkConnect";
 
@@ -73,8 +74,7 @@ export const useUserStore = defineStore("user", {
         const signature = await this.signer?.signMessage(signLoginMessage);
 
         // send message, signature and address to backend for authentication
-        const { post: authenticate, error } =
-          useApi<Backend.Models.User>("api/user/login");
+        const { post: authenticate, error } = useApi<User>("api/user/login");
 
         const result = await authenticate({
           message: signLoginMessage,
@@ -103,7 +103,7 @@ export const useUserStore = defineStore("user", {
     },
     async loginFromToken(redirect: string) {
       try {
-        const { get, error } = useApi<Backend.Models.User>("api/user");
+        const { get, error } = useApi<User>("api/user");
 
         const result = await get();
         if (!error.value) {
@@ -125,8 +125,7 @@ export const useUserStore = defineStore("user", {
     async updateEmail(email: string) {
       if (this.isAuthenticated && email !== this.email) {
         try {
-          const { patch, error } =
-            useApi<Backend.Models.User>("api/user/email");
+          const { patch, error } = useApi<User>("api/user/email");
 
           const result = await patch({ email: email });
 

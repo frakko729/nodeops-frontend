@@ -41,17 +41,22 @@ onMounted(() => {
                     class="flex space-x-2 items-center mt-2 w-max mx-auto sm:ml-0"
                   >
                     <span
+                      class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                    >
+                      {{ node.provider?.name }}
+                    </span>
+                    <span
                       v-for="chain in node.chains"
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                     >
-                      <span v-if="chain.is_mainnet">Mainnet</span>
+                      <span v-if="chain.isMainnet">Mainnet</span>
                       <span v-else>Testnet</span>
                     </span>
 
                     <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
                     >
-                      {{ node.region.name }}
+                      {{ node.region?.name }}
                     </span>
                   </div>
                 </div>
@@ -59,7 +64,7 @@ onMounted(() => {
 
               <div class="pr-0 sm:pr-12 text-center mt-6 sm:mt-0">
                 <span class="text-2xl font-bold text-blue-600"
-                  >{{ node.node_jobs_count }} Jobs running</span
+                  >{{ node.nodeJobsCount }} Jobs running</span
                 >
               </div>
             </div>

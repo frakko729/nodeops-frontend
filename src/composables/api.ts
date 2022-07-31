@@ -3,7 +3,7 @@ import { computed, Ref, ref, watch } from "vue";
 import { useNotification } from "./notification";
 import { useUserStore } from "@/stores/userStore";
 
-export const useApi = <T>(endpoint: string, token?: string) => {
+export const useApi = <T>(endpoint: string | Ref<string>, token?: string) => {
   const { showError } = useNotification();
   const api = axios.create({
     responseType: "json",
@@ -163,10 +163,6 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     }
   });
 
-  const overrideEndpoint = (endpoint: string) => {
-    endpointRef.value = endpoint;
-  };
-
   return {
     loading,
     data,
@@ -180,6 +176,5 @@ export const useApi = <T>(endpoint: string, token?: string) => {
     errorDetails,
     errorFields,
     computedClasses,
-    overrideEndpoint,
   };
 };

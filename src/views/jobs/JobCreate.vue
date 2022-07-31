@@ -27,7 +27,7 @@ const actions: Action[] = [
     description: "Write custom javascript code for your bridge.",
     icon: markRaw(CodeIcon),
     route: { name: "job-create-custom-code" },
-    isDisabled: true,
+    isDisabled: false,
   },
   {
     title: "Create with existing bridge",

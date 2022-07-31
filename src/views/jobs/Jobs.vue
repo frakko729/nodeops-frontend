@@ -9,9 +9,11 @@ import JobListItem from "@/components/JobListItem.vue";
 import JobFilter from "../../components/filters/JobFilter.vue";
 import { useFilter } from "@/composables/filter";
 import EmptyState from "@/components/EmptyState.vue";
+import { Job } from "@/interfaces/backend/models/Job";
+import { JobFilter as JobFilterI } from "@/interfaces/backend/filters/JobFilter";
 
 const router = useRouter();
-const { get, loading, data: jobs, error } = useApi<Array<any>>("api/jobs");
+const { get, loading, data: jobs, error } = useApi<Job[]>("api/jobs");
 
 /**
  * Load inital jobs and redirct, if empty
@@ -33,7 +35,7 @@ const onCreateJob = () => {
  * Reactive Filter with helpers
  */
 const { reactiveFilter, parmFilter, isFilterd, resetFilter } =
-  useFilter<Backend.Filters.JobFilter>({
+  useFilter<JobFilterI>({
     sort: "id",
     chains: [],
     status: [],

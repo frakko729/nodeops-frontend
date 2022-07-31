@@ -9,9 +9,10 @@ import { CheckCircleIcon } from "@heroicons/vue/solid";
 import { useChainStore } from "@/stores/chainStore";
 import { useGeneralStore } from "@/stores/generalStore";
 import { onMounted } from "vue";
+import { Chain } from "@/interfaces/backend/models/Chain";
 
 interface Props {
-  modelValue: Backend.Models.Chain;
+  modelValue: Chain;
 }
 const { modelValue } = defineProps<Props>();
 
@@ -66,12 +67,12 @@ onMounted(() => {
               <RadioGroupDescription
                 as="span"
                 :class="{
-                  'bg-blue-100 text-blue-800': chain.is_mainnet,
-                  'bg-red-100 text-red-800': !chain.is_mainnet,
+                  'bg-blue-100 text-blue-800': chain.isMainnet,
+                  'bg-red-100 text-red-800': !chain.isMainnet,
                 }"
                 class="mt-2 w-max inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
               >
-                <span v-if="chain.is_mainnet">Mainnet</span>
+                <span v-if="chain.isMainnet">Mainnet</span>
                 <span v-else>Testnet</span>
               </RadioGroupDescription>
             </div>

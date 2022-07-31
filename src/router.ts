@@ -74,7 +74,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/jobs/:jobId/edit",
     name: "job-edit",
     component: () =>
-      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobCreate.vue"),
+      import(/* webpackChunkName: "jobs" */ "@/views/jobs/JobForm.vue"),
     meta: { requiresAuth: true, layout: AppLayout, parent: "jobs" },
   },
   {

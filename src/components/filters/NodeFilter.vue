@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { Chain } from "@/interfaces/backend/models/Chain";
+import { NodeFilter } from "@/interfaces/backend/filters/NodeFilter";
 import { useChainStore } from "@/stores/chainStore";
 import { ref } from "vue";
 import DropdownCheckboxFilter from "./inputs/DropdownCheckboxFilter.vue";
 
 interface Props {
-  modelValue: Backend.Filters.NodeFilter;
+  modelValue: NodeFilter;
 }
 
 const { modelValue } = defineProps<Props>();
@@ -16,7 +18,7 @@ const chainOptions = ref<any>([]);
 
 const chainStore = useChainStore();
 chainStore.loadChains().then(() => {
-  chainOptions.value = chainStore.chains.map((chain: Backend.Models.Chain) => {
+  chainOptions.value = chainStore.chains.map((chain: Chain) => {
     return {
       label: chain.name,
       value: chain.id,
